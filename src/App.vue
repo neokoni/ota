@@ -1,85 +1,44 @@
-<script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
-</script>
-
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
+  <mdui-layout>
+    <!--顶栏部分-->
+    <mdui-top-app-bar
+        class="main-top-app-bar"
+        scroll-target="header-scroll-behavior-elevate"
+        scroll-behavior="elevate"
+    >
+      <mdui-button-icon @click="switchDrawer" id="menu-button" icon="menu--two-tone"></mdui-button-icon>
+      <mdui-avatar src="https://res.neokoni.ink/neokoni/svg/favicon.svg"></mdui-avatar>
+      <mdui-top-app-bar-title>Neokoni's OTA Center</mdui-top-app-bar-title>
+      <div style="flex-grow: 1"></div>
+      <div class="header-scroll-behavior-elevate" style="height: 160px;overflow: auto;">
+        <div style="height: 1000px"></div>
+      </div>
+    </mdui-top-app-bar>
 
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
-    </div>
-  </header>
-
-  <RouterView />
+    <!--左侧抽屉部分-->
+    <mdui-navigation-drawer class="main-navigation-drawer">
+      <mdui-list>
+        <mdui-list-item>Navigation drawer</mdui-list-item>
+      </mdui-list>
+    </mdui-navigation-drawer>
+    <!--主内容部分-->
+    <mdui-layout-main class="layout-main" style="min-height: 300px">
+      <div>
+        Main
+      </div>
+    </mdui-layout-main>
+  </mdui-layout>
 </template>
 
-<style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
-}
+<style scoped></style>
+<script setup lang="ts">
+import 'mdui/mdui.css';
+import 'mdui';
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
-}
-
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
+function switchDrawer() {
+  const drawer = document.querySelector("mdui-navigation-drawer");
+  if (drawer) {
+    drawer.open = !drawer.open;
   }
 }
-</style>
+</script>
