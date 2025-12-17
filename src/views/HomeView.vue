@@ -6,8 +6,8 @@
     <div class="hero-section">
       <h1 class="hero-title">Neokoni's OTA Center</h1>
       <p class="hero-description">
-        您的一站式设备更新与变更日志中心。
-        简单、快速、可靠。
+        Self hosted OTA info site for
+        Neokoni's ROM builds.
       </p>
       <div class="hero-actions">
         <mdui-button variant="filled" end-icon="arrow_forward--two-tone" @click="$router.push('/devices')">选择设备</mdui-button>
