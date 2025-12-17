@@ -1,44 +1,51 @@
 <template>
   <mdui-layout>
-    <!--顶栏部分-->
+    <!-- Top App Bar -->
     <mdui-top-app-bar
         class="main-top-app-bar"
-        scroll-target="header-scroll-behavior-elevate"
         scroll-behavior="elevate"
     >
-      <mdui-button-icon @click="switchDrawer" id="menu-button" icon="menu--two-tone"></mdui-button-icon>
+      <mdui-button-icon @click="drawerOpen = !drawerOpen" icon="menu--two-tone"></mdui-button-icon>
       <mdui-avatar src="https://res.neokoni.ink/neokoni/svg/favicon.svg"></mdui-avatar>
       <mdui-top-app-bar-title>Neokoni's OTA Center</mdui-top-app-bar-title>
       <div style="flex-grow: 1"></div>
-      <div class="header-scroll-behavior-elevate" style="height: 160px;overflow: auto;">
-        <div style="height: 1000px"></div>
-      </div>
     </mdui-top-app-bar>
 
-    <!--左侧抽屉部分-->
-    <mdui-navigation-drawer class="main-navigation-drawer">
+    <!-- Navigation Drawer -->
+    <mdui-navigation-drawer 
+      class="main-navigation-drawer"
+      :open="drawerOpen"
+      @open="drawerOpen = true"
+      @close="drawerOpen = false"
+      close-on-overlay-click
+    >
       <mdui-list>
-        <mdui-list-item>Navigation drawer</mdui-list-item>
+        <mdui-list-item rounded @click="navigate('/')" icon="home--two-tone">Home</mdui-list-item>
+        <mdui-list-item rounded @click="navigate('/about')" icon="info--two-tone">About</mdui-list-item>
       </mdui-list>
     </mdui-navigation-drawer>
-    <!--主内容部分-->
-    <mdui-layout-main class="layout-main" style="min-height: 300px">
-      <div>
-        Main
-      </div>
+
+    <!-- Main Content -->
+    <mdui-layout-main class="layout-main" style="min-height: 100vh">
+      <router-view></router-view>
     </mdui-layout-main>
   </mdui-layout>
 </template>
 
-<style scoped></style>
 <script setup lang="ts">
-import 'mdui/mdui.css';
-import 'mdui';
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 
-function switchDrawer() {
-  const drawer = document.querySelector("mdui-navigation-drawer");
-  if (drawer) {
-    drawer.open = !drawer.open;
-  }
+const drawerOpen = ref(false);
+const router = useRouter();
+
+function navigate(path: string) {
+  router.push(path);
+  // Close drawer on mobile/overlay mode
+  drawerOpen.value = false;
 }
 </script>
+
+<style scoped>
+/* Add any component-specific styles here */
+</style>

@@ -1,15 +1,11 @@
 <template>
   <div class="about">
-    <h1>This is an about page</h1>
+    <mdui-card style="padding: 20px; margin: 20px;">
+      <h1>About</h1>
+      <p>This is an about page.</p>
+    </mdui-card>
   </div>
 </template>
 
-<style>
-@media (min-width: 1024px) {
-  .about {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-  }
-}
+<style scoped>
 </style>
