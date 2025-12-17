@@ -7,6 +7,7 @@ export interface Release {
 export interface VersionConfig {
   version: string;
   label: string;
+  otaUrl?: string;
   releases: Release[];
 }
 

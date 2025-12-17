@@ -1,0 +1,13 @@
+{
+  "response": [
+    {
+      "datetime": 1734500000,
+      "filename": "AviumUI-16.1-lemonades-OFFICIAL.zip",
+      "id": "md5sum_here",
+      "romtype": "OFFICIAL",
+      "size": 1024000000,
+      "url": "https://download.example.com/lemonades/AviumUI-16.1.zip",
+      "version": "16.1"
+    }
+  ]
+}

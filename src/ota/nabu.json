@@ -9,6 +9,7 @@
         {
           "version": "avium-16",
           "label": "最新发布",
+          "otaUrl": "/ota_payloads/nabu_avium16.json",
           "releases": [
             {
               "date": "2025-12-20",

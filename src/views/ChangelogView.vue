@@ -4,7 +4,7 @@
       <mdui-button-icon icon="arrow_back--two-tone" @click="$router.back()"></mdui-button-icon>
       <div>
         <h1>{{ deviceName }}</h1>
-        <a :href="changelogUrl" target="_blank" class="json-link">查看更新日志文件</a>
+        <a v-if="otaUrl" :href="otaUrl" target="_blank" class="json-link">查看系统更新文件 (JSON)</a>
         <p class="subtitle">{{ systemName }} - {{ versionName }}</p>
       </div>
     </div>
@@ -51,7 +51,7 @@ const deviceName = computed(() => device.value?.name || codename.value);
 
 const system = computed(() => getSystem(codename.value, systemName.value));
 const versionConfig = computed(() => system.value?.versions.find(v => v.version === versionName.value));
-const changelogUrl = computed(() => (versionConfig.value as any)?.changelog);
+const otaUrl = computed(() => versionConfig.value?.otaUrl);
 
 const changelogData = computed(() => {
   if (!versionConfig.value) return null;
