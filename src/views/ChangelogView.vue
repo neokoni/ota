@@ -18,7 +18,7 @@
           :variant="index === 0 ? 'filled' : 'elevated'"
         >
           <div class="card-header">
-            <h3>更新 {{ release.date }} <span v-if="release.version">({{ release.version }})</span></h3>
+            <h3>更新 {{ release.date }}</h3>
             <mdui-chip v-if="index === 0" variant="filter" selected>最新</mdui-chip>
           </div>
           <mdui-divider></mdui-divider>
