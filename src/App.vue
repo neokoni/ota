@@ -9,6 +9,7 @@
       <mdui-avatar src="https://res.neokoni.ink/neokoni/svg/favicon.svg"></mdui-avatar>
       <mdui-top-app-bar-title>Neokoni's OTA Center</mdui-top-app-bar-title>
       <div style="flex-grow: 1"></div>
+      <mdui-button-icon :icon="themeIcon" @click="toggleTheme"></mdui-button-icon>
     </mdui-top-app-bar>
 
     <!-- Navigation Drawer -->
@@ -51,13 +52,45 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { setTheme } from 'mdui';
 import { devices } from '@/config/devices';
 import { siteConfig } from '@/config/site';
 
 const drawerOpen = ref(false);
 const router = useRouter();
+
+// Theme Logic
+type ThemeMode = 'auto' | 'light' | 'dark';
+const themeMode = ref<ThemeMode>('auto');
+
+const themeIcon = computed(() => {
+  switch (themeMode.value) {
+    case 'light': return 'light_mode--two-tone';
+    case 'dark': return 'dark_mode--two-tone';
+    default: return 'brightness_auto--two-tone';
+  }
+});
+
+function toggleTheme() {
+  if (themeMode.value === 'auto') themeMode.value = 'light';
+  else if (themeMode.value === 'light') themeMode.value = 'dark';
+  else themeMode.value = 'auto';
+  
+  setTheme(themeMode.value);
+  localStorage.setItem('theme-mode', themeMode.value);
+}
+
+onMounted(() => {
+  const saved = localStorage.getItem('theme-mode') as ThemeMode;
+  if (saved && ['auto', 'light', 'dark'].includes(saved)) {
+    themeMode.value = saved;
+    setTheme(saved);
+  } else {
+    setTheme('auto');
+  }
+});
 
 function navigate(path: string) {
   router.push(path);
