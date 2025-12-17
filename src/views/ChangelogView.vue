@@ -51,6 +51,7 @@ const deviceName = computed(() => device.value?.name || codename.value);
 
 const system = computed(() => getSystem(codename.value, systemName.value));
 const versionConfig = computed(() => system.value?.versions.find(v => v.version === versionName.value));
+const changelogUrl = computed(() => (versionConfig.value as any)?.changelog);
 
 const changelogData = computed(() => {
   if (!versionConfig.value) return null;
