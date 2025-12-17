@@ -1,0 +1,14 @@
+{
+  "device": "Xiaomi Pad 5",
+  "codename": "nabu",
+  "system": "AviumUI",
+  "releases": [
+    {
+      "date": "2025-12-20",
+      "changes": [
+        "初始版本发布",
+        "适配平板大屏操作"
+      ]
+    }
+  ]
+}

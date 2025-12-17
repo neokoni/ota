@@ -4,15 +4,22 @@
       <div class="card-content">
         <div class="header">
           <mdui-button-icon icon="arrow_back--two-tone" @click="$router.back()"></mdui-button-icon>
-          <h1>{{ system }} for {{ deviceName }}</h1>
+          <h1>{{ systemName }} for {{ deviceName }}</h1>
         </div>
         <p>选择一个版本以查看更新日志。</p>
         
         <div class="version-list">
-          <mdui-card clickable class="version-item" variant="elevated" @click="selectVersion('avium-16')">
+          <mdui-card 
+            v-for="version in versions"
+            :key="version.version"
+            clickable 
+            class="version-item" 
+            variant="elevated" 
+            @click="selectVersion(version.version)"
+          >
             <div class="version-info">
-              <h3>avium-16</h3>
-              <p>最新发布</p>
+              <h3>{{ version.version }}</h3>
+              <p>{{ version.label }}</p>
             </div>
             <mdui-icon name="chevron_right--two-tone"></mdui-icon>
           </mdui-card>
@@ -25,21 +32,21 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { getDevice, getSystem } from '@/config/devices';
 
 const route = useRoute();
 const router = useRouter();
 const codename = computed(() => route.params.codename as string);
-const system = computed(() => route.params.system as string);
+const systemName = computed(() => route.params.system as string);
 
-const deviceMap: Record<string, string> = {
-  'lemonades': '一加9R',
-  'nabu': '小米平板5'
-};
+const device = computed(() => getDevice(codename.value));
+const deviceName = computed(() => device.value?.name || codename.value);
 
-const deviceName = computed(() => deviceMap[codename.value] || codename.value);
+const system = computed(() => getSystem(codename.value, systemName.value));
+const versions = computed(() => system.value?.versions || []);
 
 function selectVersion(version: string) {
-  router.push(`/device/${codename.value}/${system.value}/${version}`);
+  router.push(`/device/${codename.value}/${systemName.value}/${version}`);
 }
 </script>
 

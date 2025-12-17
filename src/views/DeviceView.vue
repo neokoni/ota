@@ -6,9 +6,16 @@
         <p>选择一个系统以查看可用版本。</p>
         
         <div class="system-list">
-          <mdui-card clickable class="system-item" variant="elevated" @click="selectSystem('AviumUI')">
+          <mdui-card 
+            v-for="system in systems"
+            :key="system.name"
+            clickable 
+            class="system-item" 
+            variant="elevated" 
+            @click="selectSystem(system.name)"
+          >
             <div class="system-info">
-              <h3>AviumUI</h3>
+              <h3>{{ system.name }}</h3>
               <p>基于 Android</p>
             </div>
             <mdui-icon name="chevron_right--two-tone"></mdui-icon>
@@ -22,17 +29,15 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { getDevice } from '@/config/devices';
 
 const route = useRoute();
 const router = useRouter();
 const codename = computed(() => route.params.codename as string);
 
-const deviceMap: Record<string, string> = {
-  'lemonades': '一加9R',
-  'nabu': '小米平板5'
-};
-
-const deviceName = computed(() => deviceMap[codename.value] || '未知设备');
+const device = computed(() => getDevice(codename.value));
+const deviceName = computed(() => device.value?.name || '未知设备');
+const systems = computed(() => device.value?.systems || []);
 
 function selectSystem(system: string) {
   router.push(`/device/${codename.value}/${system}`);

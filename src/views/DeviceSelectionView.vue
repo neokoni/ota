@@ -2,24 +2,26 @@
   <div class="device-selection-view">
     <h1 class="page-title">选择您的设备</h1>
     <div class="device-grid">
-      <mdui-card clickable class="device-card" @click="$router.push('/device/lemonades')">
+      <mdui-card 
+        v-for="device in devices" 
+        :key="device.codename"
+        clickable 
+        class="device-card" 
+        @click="$router.push(`/device/${device.codename}`)"
+      >
         <div class="device-info">
-          <h3>一加9R</h3>
-          <p>lemonades</p>
-        </div>
-        <mdui-icon name="chevron_right--two-tone"></mdui-icon>
-      </mdui-card>
-
-      <mdui-card clickable class="device-card" @click="$router.push('/device/nabu')">
-        <div class="device-info">
-          <h3>小米平板5</h3>
-          <p>nabu</p>
+          <h3>{{ device.name }}</h3>
+          <p>{{ device.codename }}</p>
         </div>
         <mdui-icon name="chevron_right--two-tone"></mdui-icon>
       </mdui-card>
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { devices } from '@/config/devices';
+</script>
 
 <style scoped>
 .device-selection-view {
