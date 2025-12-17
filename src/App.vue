@@ -20,8 +20,11 @@
       close-on-overlay-click
     >
       <mdui-list>
-        <mdui-list-item rounded @click="navigate('/')" icon="home--two-tone">Home</mdui-list-item>
-        <mdui-list-item rounded @click="navigate('/about')" icon="info--two-tone">About</mdui-list-item>
+        <mdui-list-item rounded @click="navigate('/')" icon="home--two-tone">主页</mdui-list-item>
+        <mdui-divider></mdui-divider>
+        <mdui-list-subheader>设备列表</mdui-list-subheader>
+        <mdui-list-item rounded @click="navigate('/device/lemonades')" icon="smartphone--two-tone">OnePlus 9R (lemonades)</mdui-list-item>
+        <mdui-list-item rounded @click="navigate('/device/nabu')" icon="tablet_android--two-tone">Xiaomi Pad 5 (nabu)</mdui-list-item>
       </mdui-list>
     </mdui-navigation-drawer>
 
