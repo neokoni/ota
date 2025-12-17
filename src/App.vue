@@ -6,8 +6,10 @@
         scroll-behavior="elevate"
     >
       <mdui-button-icon @click="drawerOpen = !drawerOpen" icon="menu--two-tone"></mdui-button-icon>
-      <mdui-avatar src="https://res.neokoni.ink/neokoni/svg/favicon.svg"></mdui-avatar>
-      <mdui-top-app-bar-title>Neokoni's OTA Center</mdui-top-app-bar-title>
+      <div class="app-bar-branding" @click="navigate('/')">
+        <mdui-avatar src="https://res.neokoni.ink/neokoni/svg/favicon.svg"></mdui-avatar>
+        <mdui-top-app-bar-title class="app-title">Neokoni's OTA Center</mdui-top-app-bar-title>
+      </div>
       <div style="flex-grow: 1"></div>
       <mdui-button-icon :icon="themeIcon" @click="toggleTheme"></mdui-button-icon>
     </mdui-top-app-bar>
@@ -116,5 +118,22 @@ function navigate(path: string) {
 
 .site-footer a:hover {
   text-decoration: underline;
+}
+
+.app-bar-branding {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-left: 12px;
+}
+
+.app-bar-branding mdui-avatar {
+  margin-right: 12px;
+}
+
+@media (max-width: 600px) {
+  .app-title {
+    font-size: 1.1rem;
+  }
 }
 </style>
