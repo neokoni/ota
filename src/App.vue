@@ -36,8 +36,16 @@
     </mdui-navigation-drawer>
 
     <!-- Main Content -->
-    <mdui-layout-main class="layout-main" style="min-height: 100vh">
-      <router-view></router-view>
+    <mdui-layout-main class="layout-main" style="min-height: 100vh; display: flex; flex-direction: column;">
+      <div style="flex: 1;">
+        <router-view></router-view>
+      </div>
+      
+      <footer class="site-footer">
+        <a :href="siteConfig.icpLink" target="_blank" rel="noopener noreferrer">
+          {{ siteConfig.icp }}
+        </a>
+      </footer>
     </mdui-layout-main>
   </mdui-layout>
 </template>
@@ -46,6 +54,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { devices } from '@/config/devices';
+import { siteConfig } from '@/config/site';
 
 const drawerOpen = ref(false);
 const router = useRouter();
@@ -59,4 +68,20 @@ function navigate(path: string) {
 
 <style scoped>
 /* Add any component-specific styles here */
+.site-footer {
+  text-align: center;
+  padding: 20px;
+  margin-top: auto;
+  color: rgb(var(--mdui-color-on-surface-variant));
+  font-size: 0.875rem;
+}
+
+.site-footer a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.site-footer a:hover {
+  text-decoration: underline;
+}
 </style>
