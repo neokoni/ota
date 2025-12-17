@@ -1,0 +1,26 @@
+{
+  "codename": "nabu",
+  "name": "Xiaomi Pad 5",
+  "systems": [
+    {
+      "name": "AviumUI",
+      "description": "基于 Android",
+      "versions": [
+        {
+          "version": "avium-16",
+          "label": "最新发布",
+          "releases": [
+            {
+              "date": "2025-12-20",
+              "version": "16.0",
+              "changes": [
+                "初始版本发布",
+                "适配平板大屏操作"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

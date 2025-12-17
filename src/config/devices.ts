@@ -1,7 +1,13 @@
+export interface Release {
+  date: string;
+  version?: string;
+  changes: string[];
+}
+
 export interface VersionConfig {
   version: string;
   label: string;
-  changelogJsonUrl?: string;
+  releases: Release[];
 }
 
 export interface SystemConfig {
@@ -16,47 +22,10 @@ export interface DeviceConfig {
   systems: SystemConfig[];
 }
 
-export const devices: DeviceConfig[] = [
-  {
-    codename: 'lemonades',
-    name: 'OnePlus 9R',
-    systems: [
-      {
-        name: 'AviumUI',
-        description: '基于 Android',
-        versions: [
-          {
-            version: 'avium-16',
-            label: '最新发布',
-            changelogJsonUrl: '/ota/lemonades.json'
-          },
-          {
-            version: 'avium-15',
-            label: '旧版本',
-            changelogJsonUrl: '/ota/lemonades.json'
-          }
-        ]
-      }
-    ]
-  },
-  {
-    codename: 'nabu',
-    name: 'Xiaomi Pad 5',
-    systems: [
-      {
-        name: 'AviumUI',
-        description: '基于 Android',
-        versions: [
-          {
-            version: 'avium-16',
-            label: '最新发布',
-            changelogJsonUrl: '/ota/nabu.json'
-          }
-        ]
-      }
-    ]
-  }
-];
+// Load all JSON files from src/ota directory
+const deviceModules = import.meta.glob('@/ota/*.json', { eager: true });
+
+export const devices: DeviceConfig[] = Object.values(deviceModules).map((mod: any) => mod.default || mod);
 
 export const getDevice = (codename: string): DeviceConfig | undefined => {
   return devices.find(d => d.codename === codename);
@@ -66,3 +35,4 @@ export const getSystem = (codename: string, systemName: string): SystemConfig | 
   const device = getDevice(codename);
   return device?.systems.find(s => s.name === systemName);
 };
+

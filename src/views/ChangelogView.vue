@@ -10,15 +10,7 @@
     </div>
 
     <div class="changelog-list">
-      <div v-if="loading" class="state-container">
-        <mdui-circular-progress></mdui-circular-progress>
-      </div>
-      
-      <div v-else-if="error" class="state-container">
-        <p>{{ error }}</p>
-      </div>
-
-      <template v-else-if="changelogData">
+      <template v-if="changelogData">
         <mdui-card 
           v-for="(release, index) in changelogData.releases" 
           :key="release.date"
@@ -37,27 +29,17 @@
           </div>
         </mdui-card>
       </template>
+      <div v-else class="state-container">
+        <p>未找到更新日志</p>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { getDevice, getSystem } from '@/config/devices';
-
-interface Release {
-  date: string;
-  version?: string;
-  changes: string[];
-}
-
-interface ChangelogData {
-  device: string;
-  codename: string;
-  system: string;
-  releases: Release[];
-}
 
 const route = useRoute();
 const codename = computed(() => route.params.codename as string);
@@ -70,36 +52,13 @@ const deviceName = computed(() => device.value?.name || codename.value);
 const system = computed(() => getSystem(codename.value, systemName.value));
 const versionConfig = computed(() => system.value?.versions.find(v => v.version === versionName.value));
 
-const changelogUrl = computed(() => versionConfig.value?.changelogJsonUrl || '#');
-
-const changelogData = ref<ChangelogData | null>(null);
-const loading = ref(false);
-const error = ref<string | null>(null);
-
-const fetchChangelog = async () => {
-  if (!changelogUrl.value || changelogUrl.value === '#') return;
-  
-  loading.value = true;
-  error.value = null;
-  
-  try {
-    const response = await fetch(changelogUrl.value);
-    if (!response.ok) throw new Error('Failed to load changelog');
-    const data = await response.json();
-    // Sort releases by date descending
-    if (data.releases) {
-      data.releases.sort((a: Release, b: Release) => new Date(b.date).getTime() - new Date(a.date).getTime());
-    }
-    changelogData.value = data;
-  } catch (e) {
-    error.value = '无法加载更新日志';
-    console.error(e);
-  } finally {
-    loading.value = false;
-  }
-};
-
-watch(() => changelogUrl.value, fetchChangelog, { immediate: true });
+const changelogData = computed(() => {
+  if (!versionConfig.value) return null;
+  // Sort releases by date descending
+  const releases = [...(versionConfig.value.releases || [])];
+  releases.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  return { releases };
+});
 </script>
 
 <style scoped>

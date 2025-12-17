@@ -1,0 +1,41 @@
+{
+  "codename": "lemonades",
+  "name": "OnePlus 9R",
+  "systems": [
+    {
+      "name": "AviumUI",
+      "description": "基于 Android",
+      "versions": [
+        {
+          "version": "avium-16",
+          "label": "最新发布",
+          "releases": [
+            {
+              "date": "2025-12-18",
+              "version": "16.1",
+              "changes": [
+                "更新至 Android 16 底层",
+                "修复系统稳定性问题",
+                "提升电池续航",
+                "添加新的自定义选项"
+              ]
+            },
+            {
+              "date": "2025-11-01",
+              "version": "16.0",
+              "changes": [
+                "AviumUI 初始版本",
+                "基础功能实现"
+              ]
+            }
+          ]
+        },
+        {
+          "version": "avium-15",
+          "label": "旧版本",
+          "releases": []
+        }
+      ]
+    }
+  ]
+}
