@@ -28,8 +28,8 @@ const router = useRouter();
 const codename = computed(() => route.params.codename as string);
 
 const deviceMap: Record<string, string> = {
-  'lemonades': 'OnePlus 9R',
-  'nabu': 'Xiaomi Pad 5'
+  'lemonades': '一加9R',
+  'nabu': '小米平板5'
 };
 
 const deviceName = computed(() => deviceMap[codename.value] || '未知设备');

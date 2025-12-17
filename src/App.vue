@@ -23,8 +23,8 @@
         <mdui-list-item rounded @click="navigate('/')" icon="home--two-tone">主页</mdui-list-item>
         <mdui-divider></mdui-divider>
         <mdui-list-subheader>设备列表</mdui-list-subheader>
-        <mdui-list-item rounded @click="navigate('/device/lemonades')" icon="smartphone--two-tone">OnePlus 9R (lemonades)</mdui-list-item>
-        <mdui-list-item rounded @click="navigate('/device/nabu')" icon="tablet_android--two-tone">Xiaomi Pad 5 (nabu)</mdui-list-item>
+        <mdui-list-item rounded @click="navigate('/device/lemonades')" icon="smartphone--two-tone">一加9R (lemonades)</mdui-list-item>
+        <mdui-list-item rounded @click="navigate('/device/nabu')" icon="tablet_android--two-tone">小米平板5 (nabu)</mdui-list-item>
       </mdui-list>
     </mdui-navigation-drawer>
 

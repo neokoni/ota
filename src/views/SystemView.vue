@@ -32,8 +32,8 @@ const codename = computed(() => route.params.codename as string);
 const system = computed(() => route.params.system as string);
 
 const deviceMap: Record<string, string> = {
-  'lemonades': 'OnePlus 9R',
-  'nabu': 'Xiaomi Pad 5'
+  'lemonades': '一加9R',
+  'nabu': '小米平板5'
 };
 
 const deviceName = computed(() => deviceMap[codename.value] || codename.value);

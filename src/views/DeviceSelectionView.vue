@@ -4,7 +4,7 @@
     <div class="device-grid">
       <mdui-card clickable class="device-card" @click="$router.push('/device/lemonades')">
         <div class="device-info">
-          <h3>OnePlus 9R</h3>
+          <h3>一加9R</h3>
           <p>lemonades</p>
         </div>
         <mdui-icon name="chevron_right--two-tone"></mdui-icon>
@@ -12,7 +12,7 @@
 
       <mdui-card clickable class="device-card" @click="$router.push('/device/nabu')">
         <div class="device-info">
-          <h3>Xiaomi Pad 5</h3>
+          <h3>小米平板5</h3>
           <p>nabu</p>
         </div>
         <mdui-icon name="chevron_right--two-tone"></mdui-icon>
