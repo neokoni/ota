@@ -16,7 +16,6 @@
           >
             <div class="system-info">
               <h3>{{ system.name }}</h3>
-              <p>基于 Android</p>
             </div>
             <mdui-icon name="chevron_right--two-tone"></mdui-icon>
           </mdui-card>
