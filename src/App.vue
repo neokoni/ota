@@ -45,8 +45,8 @@
       </div>
       
       <footer class="site-footer">
-        <a :href="siteConfig.icpLink" target="_blank" rel="noopener noreferrer">
-          {{ siteConfig.icp }}
+        <a v-for="(item, index) in siteConfig" :key="index" :href="item.icpLink" target="_blank" rel="noopener noreferrer">
+          {{ item.icp }}<br>
         </a>
       </footer>
     </mdui-layout-main>
