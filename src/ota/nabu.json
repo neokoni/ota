@@ -8,7 +8,7 @@
         {
           "version": "avium-16",
           "label": "类原生 AviumUI 16",
-          "otaUrl": "/ota_payloads/nabu_avium16.json",
+          "otaUrl": "/AviumUI/avium-16/nabu/ota.json",
           "releases": [
             {
               "date": "2025-12-07",
