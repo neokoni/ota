@@ -4,37 +4,32 @@
   "systems": [
     {
       "name": "AviumUI",
-      "description": "基于 Android",
       "versions": [
         {
           "version": "avium-16",
-          "label": "最新发布",
+          "label": "类原生 AviumUI 16",
           "otaUrl": "/ota_payloads/lemonades_avium16.json",
           "releases": [
             {
-              "date": "2025-12-18",
-              "version": "16.1",
+              "date": "2025-12-07",
               "changes": [
-                "更新至 Android 16 底层",
-                "修复系统稳定性问题",
-                "提升电池续航",
-                "添加新的自定义选项"
+                "从SunOS摘来谷歌相册无限存储Spoof",
+                "更新上游源码，更新SukiSU",
+                "额外构建无root的boot镜像，网盘自取",
+                "内核从xiaomi sm8250加入了last kmsg",
+                "<s>加入了一些可能玄学的内核修改abab</s>"
               ]
             },
             {
-              "date": "2025-11-01",
-              "version": "16.0",
+              "date": "2025-11-30",
               "changes": [
-                "AviumUI 初始版本",
-                "基础功能实现"
+                "一加9R AviumUI 初始构建版本",
+                "切换SukiSU钩子为Manual Hook",
+                "<s>加入了可能有效玄学修改abab</s>",
+                "初始版本源码修改: 去除los prop"
               ]
             }
           ]
-        },
-        {
-          "version": "avium-15",
-          "label": "旧版本",
-          "releases": []
         }
       ]
     }
