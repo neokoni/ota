@@ -18,13 +18,13 @@
           :variant="index === 0 ? 'filled' : 'elevated'"
         >
           <div class="card-header">
-            <h3>更新 {{ release.date }}</h3>
+            <h3>{{ release.date }}</h3>
             <mdui-chip v-if="index === 0" variant="filter" selected>最新</mdui-chip>
           </div>
           <mdui-divider></mdui-divider>
           <div class="card-body">
             <ul>
-              <li v-for="(change, idx) in release.changes" :key="idx">{{ change }}</li>
+              <li v-for="(change, idx) in release.changes" :key="idx"  v-html="change"></li>
             </ul>
           </div>
         </mdui-card>
