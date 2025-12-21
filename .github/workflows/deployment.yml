@@ -1,0 +1,40 @@
+# This is a basic workflow to help you get started with Actions
+
+name: deploy to server
+
+# Controls when the workflow will run
+on:
+  workflow_dispatch:
+  push:
+   branches: [ "main" ]
+  pull_request:
+   branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout source
+        uses: actions/checkout@v4
+
+      - name: setup nodejs
+        uses: actions/setup-node@v4
+        with:
+          node-version: latest
+          
+      - name: install nodejs depends
+        run: npm install
+
+      - name: build website file
+        run: npm run build
+
+      - name: SSH Server Deploy
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          source: public/*
+          target: /opt/1panel/www/sites/ota.neokoni.ink/index/
+          rm: true
+          strip_components: 1
