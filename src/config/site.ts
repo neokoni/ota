@@ -14,5 +14,5 @@ export const siteConfig = [
 ]
 
 export const wallpaperConfig = {
-  api: "https://bing.img.run/1366x768.php" // Replace with your wallpaper API
+  api: "https://bing.biturl.top/?resolution=320x240&format=image&index=0&mkt=zh-CN" // Replace with your wallpaper API
 }
