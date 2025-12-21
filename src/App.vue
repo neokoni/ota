@@ -56,9 +56,9 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { setTheme } from 'mdui';
+import { setTheme, getColorFromImage, setColorScheme } from 'mdui';
 import { devices } from '@/config/devices';
-import { siteConfig } from '@/config/site';
+import { siteConfig, wallpaperConfig } from '@/config/site';
 
 const drawerOpen = ref(false);
 const router = useRouter();
@@ -84,6 +84,34 @@ function toggleTheme() {
   localStorage.setItem('theme-mode', themeMode.value);
 }
 
+async function initDynamicColors() {
+  if (!wallpaperConfig.api) return;
+
+  const timeout = 3000; // 3 seconds timeout
+  const img = new Image();
+  img.crossOrigin = "Anonymous";
+
+  const loadPromise = new Promise<HTMLImageElement>((resolve, reject) => {
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error('Failed to load image'));
+    img.src = wallpaperConfig.api;
+  });
+
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    setTimeout(() => reject(new Error('Timeout')), timeout);
+  });
+
+  try {
+    await Promise.race([loadPromise, timeoutPromise]);
+    const color = await getColorFromImage(img);
+    setColorScheme(color);
+    console.log('Dynamic color applied:', color);
+  } catch (error) {
+    console.warn('Dynamic color initialization failed:', error);
+    // Fallback or do nothing (default colors)
+  }
+}
+
 onMounted(() => {
   const saved = localStorage.getItem('theme-mode') as ThemeMode;
   if (saved && ['auto', 'light', 'dark'].includes(saved)) {
@@ -92,6 +120,8 @@ onMounted(() => {
   } else {
     setTheme('auto');
   }
+  
+  initDynamicColors();
 });
 
 function navigate(path: string) {
