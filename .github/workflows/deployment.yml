@@ -34,7 +34,7 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USERNAME }}
           password: ${{ secrets.SERVER_PASSWORD }}
-          source: public/*
+          source: dist/*
           target: /opt/1panel/www/sites/ota.neokoni.ink/index/
           rm: true
           strip_components: 1
