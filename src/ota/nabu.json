@@ -11,6 +11,17 @@
           "otaUrl": "/AviumUI/avium-16/nabu/ota.json",
           "releases": [
             {
+              "date": "2025-12-22",
+              "changes": [
+                "源码: ",
+                "1. 更新AviumUI源码",
+                "2. 更新SukiSU至<a href=\"https://github.com/SukiSU-Ultra/SukiSU-Ultra/tree/08e17bda0e4b975130b859aac626c660890e9a06\" target=\"_blank\">08e17bda@builtin</a>",
+                "修复: ",
+                "1. 修复潜在<code>__cgroup_bpf_run_filter_skb</code>中UFA导致的随机重启[<a href=\"https://github.com/LineageOS/android_kernel_qcom_sm8250/commit/a86148f89f96bc7aa8d758163bd9191bc10da6f9\" target=\"_blank\">a86148f</a>]",
+                "2. Updater: 更新日志url字符替换错误"
+              ]
+            },
+            {
               "date": "2025-12-07",
               "changes": [
                 "从SunOS摘来谷歌相册无限存储Spoof",
