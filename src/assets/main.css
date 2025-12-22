@@ -7,3 +7,9 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+code { /* from https://developer.mozilla.org/zh-CN/docs/Web/HTML/Reference/Elements/code */
+  background-color: rgba(var(--mdui-color-on-surface-variant), .28);
+  border-radius: 3px;
+  padding: 0 3px;
+}
