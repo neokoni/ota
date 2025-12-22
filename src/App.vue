@@ -87,7 +87,7 @@ function toggleTheme() {
 async function initDynamicColors() {
   if (!wallpaperConfig.api) return;
 
-  const timeout = 3000; // 3 seconds timeout
+  const timeout = 5 * 1000; // 3 seconds timeout
   const img = new Image();
   img.crossOrigin = "Anonymous";
 
