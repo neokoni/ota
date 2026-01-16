@@ -11,6 +11,19 @@
           "otaUrl": "/AviumUI/avium-16/nabu/ota.json",
           "releases": [
             {
+              "date": "2026-01-16",
+              "changes": [
+                "上游代码:",
+                "1. 更新安卓补丁",
+                "2. 加入人脸识别支持",
+                "3. 加入即圈即搜支持",
+                "设备树:",
+                "1. 同步了一些上游更改",
+                "2. 启用\"饱和色\"颜色模式",
+                "3. KernelSU切换至<a href=\"https://github.com/rsuntk/KernelSU\" target=\"_blank\">RKSU分支</a>"
+              ]
+            },
+            {
               "date": "2025-12-22",
               "changes": [
                 "源码: ",
