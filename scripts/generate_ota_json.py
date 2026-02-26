@@ -3,6 +3,7 @@ import sys
 import json
 import hashlib
 import re
+import argparse
 
 # 配置部分
 BASE_URL = "https://pan.neokoni.ink/d/OneDrive-Public"
@@ -30,13 +31,25 @@ def parse_prop(prop_path):
     return props
 
 def main():
-    if len(sys.argv) != 3:
-        print("用法: python3 generate_ota_json.py <文件1> <文件2>")
-        print("其中一个必须是 .zip 文件，另一个必须是 build.prop 文件")
-        sys.exit(1)
+    parser = argparse.ArgumentParser(
+        description='生成 OTA JSON 文件',
+        epilog=(
+            '示例: python3 generate_ota_json.py file.zip build.prop'
+            ' --version=avium16 --os=AviumUI --date=2026-02-26'
+            ' --base-url=https://pan.neokoni.ink/d/OneDrive-Public'
+        )
+    )
+    parser.add_argument('file1', help='ZIP 文件或 build.prop 文件')
+    parser.add_argument('file2', help='ZIP 文件或 build.prop 文件')
+    parser.add_argument('--version', help='版本标识符 (例如: avium16), 覆盖从文件名解析的版本')
+    parser.add_argument('--os', dest='os_name', help='ROM 名称 (例如: AviumUI), 覆盖从文件名解析的 ROM 名称')
+    parser.add_argument('--date', help='日期 (格式: YYYY-MM-DD, 例如: 2026-02-26), 覆盖从文件名解析的日期')
+    parser.add_argument('--base-url', dest='base_url', help=f'基础 URL (默认: {BASE_URL})')
 
-    file1 = sys.argv[1]
-    file2 = sys.argv[2]
+    args = parser.parse_args()
+
+    file1 = args.file1
+    file2 = args.file2
 
     zip_path = None
     prop_path = None
@@ -135,8 +148,37 @@ def main():
     
     # URL 版本部分: avium16 (小写名称 + 版本)
     url_ver_part = f"{rom_name_normalized}{rom_ver}"
-    
-    url = f"{BASE_URL}/{device_codename}/{url_ver_part}/{date_formatted}/{zip_filename}"
+
+    # 路径版本部分: avium-16 (小写名称 + - + 版本)
+    path_ver_part = f"{rom_name_normalized}-{rom_ver}"
+
+    # 应用可选参数覆盖
+    base_url = args.base_url if args.base_url else BASE_URL
+
+    if args.os_name:
+        rom_name = args.os_name
+        rom_name_normalized = rom_name.lower()
+        if rom_name_normalized.endswith('ui'):
+            rom_name_normalized = rom_name_normalized[:-2]
+        # 重新计算版本部分 (除非 --version 也被提供)
+        url_ver_part = f"{rom_name_normalized}{rom_ver}"
+        path_ver_part = f"{rom_name_normalized}-{rom_ver}"
+        print(f"  (覆盖) ROM 名称: {rom_name}")
+
+    if args.version:
+        url_ver_part = args.version
+        m = re.match(r'^([a-zA-Z]+)(\d+)$', args.version)
+        path_ver_part = f"{m.group(1)}-{m.group(2)}" if m else args.version
+        print(f"  (覆盖) 版本标识符: {url_ver_part}")
+
+    if args.date:
+        date_formatted = args.date
+        print(f"  (覆盖) 日期: {date_formatted}")
+
+    if args.base_url:
+        print(f"  (覆盖) 基础 URL: {base_url}")
+
+    url = f"{base_url}/{device_codename}/{url_ver_part}/{date_formatted}/{zip_filename}"
     
     print(f"  解析到的设备: {device_codename}")
     print(f"  解析到的版本: {version_str}")
@@ -158,9 +200,6 @@ def main():
 
     # 5. 确定输出路径
     # public/AviumUI/avium-16/lemonades/ota.json
-    # 路径版本部分: avium-16 (小写名称 + - + 版本)
-    path_ver_part = f"{rom_name_normalized}-{rom_ver}" # avium-16
-    
     # 项目根目录是脚本目录的父目录
     script_dir = os.path.dirname(os.path.realpath(__file__))
     project_root = os.path.dirname(script_dir)
