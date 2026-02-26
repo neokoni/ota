@@ -64,9 +64,33 @@ const buildBpPlainText = (codename: string): string | null => {
   return releases
     .map((release) => {
       const content = (release.changes || []).map((line) => stripHtml(line)).join('\n');
-      return `==================\n    ${release.date}\n==================\n${content}`;
+      return `==================\n${release.date}(时间)\n==================\n${content}`;
     })
     .join('\n\n');
+};
+
+const alwaysPlainTextPrefix = '/plain/device';
+
+const parseAvium16DeviceFromPath = (pathname: string, prefix = '/device'): string | null => {
+  const normalizedPrefix = prefix.split('/').filter(Boolean);
+  const segments = pathname.split('/').filter(Boolean);
+  const requiredLength = normalizedPrefix.length + 3;
+
+  if (segments.length !== requiredLength) return null;
+
+  for (let i = 0; i < normalizedPrefix.length; i += 1) {
+    if (segments[i] !== normalizedPrefix[i]) return null;
+  }
+
+  const codenameIndex = normalizedPrefix.length;
+  const systemIndex = codenameIndex + 1;
+  const versionIndex = codenameIndex + 2;
+
+  if (segments[systemIndex] !== 'AviumUI' || segments[versionIndex] !== 'avium-16') {
+    return null;
+  }
+
+  return decodeURIComponent(segments[codenameIndex]);
 };
 
 const bpPlainTextMiddleware = (): Plugin => {
@@ -79,13 +103,13 @@ const bpPlainTextMiddleware = (): Plugin => {
       }
 
       const pathname = new URL(req.url || '/', 'http://localhost').pathname;
-      const match = pathname.match(/^\/device\/([^/]+)\/AviumUI\/avium-16\/?$/);
-      if (!match) {
+      const codename = parseAvium16DeviceFromPath(pathname, '/device');
+      
+      if (!codename) {
         next();
         return;
       }
 
-      const codename = decodeURIComponent(match[1]);
       const plainText = buildBpPlainText(codename);
       if (!plainText) {
         res.statusCode = 404;
@@ -111,9 +135,58 @@ const bpPlainTextMiddleware = (): Plugin => {
   };
 };
 
+const alwaysPlainTextPagePlugin = (): Plugin => {
+  const register = (middlewares: Connect.Server) => {
+    middlewares.use((req, res, next) => {
+      const pathname = new URL(req.url || '/', 'http://localhost').pathname;
+      const codename = parseAvium16DeviceFromPath(pathname, alwaysPlainTextPrefix);
+      if (!codename) {
+        next();
+        return;
+      }
+
+      const plainText = buildBpPlainText(codename);
+      if (!plainText) {
+        res.statusCode = 404;
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+        res.end('未找到更新日志');
+        return;
+      }
+
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+      res.end(plainText);
+    });
+  };
+
+  return {
+    name: 'always-plain-text-page',
+    configureServer(server) {
+      register(server.middlewares);
+    },
+    configurePreviewServer(server) {
+      register(server.middlewares);
+    },
+    generateBundle() {
+      otaDevices.forEach((device) => {
+        const content = buildBpPlainText(device.codename);
+        if (!content) return;
+
+        const fileName = `plain/device/${encodeURIComponent(device.codename)}/AviumUI/avium-16/index.txt`;
+        this.emitFile({
+          type: 'asset',
+          fileName,
+          source: content,
+        });
+      });
+    },
+  };
+};
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
+    alwaysPlainTextPagePlugin(),
     bpPlainTextMiddleware(),
     vue({
       template: {
