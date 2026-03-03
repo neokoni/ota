@@ -10,8 +10,14 @@
         Neokoni's ROM builds.
       </p>
       <div class="hero-actions">
-        <mdui-button variant="filled" end-icon="arrow_forward--two-tone" @click="$router.push('/devices')">选择设备</mdui-button>
-        <mdui-button variant="text" end-icon="open_in_new--two-tone" href="https://github.com/neokoni/ota_site" target="_blank">GitHub</mdui-button>
+        <md-filled-button trailing-icon @click="$router.push('/devices')">
+          选择设备
+          <md-icon slot="icon">arrow_forward</md-icon>
+        </md-filled-button>
+        <md-text-button trailing-icon href="https://github.com/neokoni/ota_site" target="_blank">
+          GitHub
+          <md-icon slot="icon">open_in_new</md-icon>
+        </md-text-button>
       </div>
     </div>
   </div>
@@ -35,12 +41,12 @@
   font-size: 3rem;
   font-weight: 700;
   margin-bottom: 1rem;
-  color: rgb(var(--mdui-color-primary));
+  color: var(--md-sys-color-primary);
 }
 
 .hero-description {
   font-size: 1.2rem;
-  color: rgb(var(--mdui-color-on-surface-variant));
+  color: var(--md-sys-color-on-surface-variant);
   margin-bottom: 2rem;
   line-height: 1.6;
 }
@@ -49,5 +55,6 @@
   display: flex;
   gap: 16px;
   justify-content: center;
+  flex-wrap: wrap;
 }
 </style>

@@ -9,7 +9,7 @@
         <p class="description">
           哎呀呀, 找不到了喵。
         </p>
-        <mdui-button variant="filled" @click="$router.push('/')">主页</mdui-button>
+        <md-filled-button @click="$router.push('/')">主页</md-filled-button>
       </div>
     </div>
   </div>
@@ -57,14 +57,14 @@
   font-weight: 700;
   margin: 0;
   line-height: 1;
-  color: rgb(var(--mdui-color-on-surface));
+  color: var(--md-sys-color-on-surface);
 }
 
 .description {
   margin: 24px 0 32px;
   font-size: 1.1rem;
   line-height: 1.6;
-  color: rgb(var(--mdui-color-on-surface-variant));
+  color: var(--md-sys-color-on-surface-variant);
   max-width: 450px;
 }
 

@@ -1,15 +1,41 @@
 :root {
-  --mdui-font-family: 'Roboto', 'Noto Sans SC', sans-serif;
+  --font-family: 'Roboto', 'Noto Sans SC', sans-serif;
+  /* Make md-icon use the self-hosted Material Symbols Rounded variable font */
+  --md-icon-font: 'Material Symbols Rounded Variable';
+
+  /* MD3 baseline (purple) static fallbacks — overridden at runtime by applyTheme() */
+  --md-sys-color-primary: #6750a4;
+  --md-sys-color-secondary: #625b71;
+  --md-sys-color-surface: #fffbfe;
+  --md-sys-color-surface-container-low: #f7f2fa;
+  --md-sys-color-surface-container: #f3edf7;
+  --md-sys-color-surface-container-high: #ece6f0;
+  --md-sys-color-on-surface: #1c1b1f;
+  --md-sys-color-on-surface-variant: #49454f;
+  --md-sys-color-outline-variant: #cac4d0;
 }
 
 body {
-  font-family: var(--mdui-font-family);
+  font-family: var(--font-family);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  overflow-x: hidden;
+  background-color: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+}
+
+/* Override browser-default blue/purple link colors with theme tokens */
+a {
+  color: var(--md-sys-color-primary);
+}
+
+a:visited {
+  color: var(--md-sys-color-secondary);
 }
 
 code { /* from https://developer.mozilla.org/zh-CN/docs/Web/HTML/Reference/Elements/code */
-  background-color: rgba(var(--mdui-color-on-surface-variant), .28);
+  background-color: color-mix(in srgb, var(--md-sys-color-on-surface-variant) 28%, transparent);
   border-radius: 3px;
   padding: 0 3px;
 }
