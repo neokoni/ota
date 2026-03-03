@@ -21,21 +21,27 @@
       <div class="drawer-wrapper" :class="{ open: drawerOpen }">
         <nav class="navigation-drawer">
           <md-list>
-            <md-list-item type="button" @click="navigate('/')">
-              <md-icon slot="start">home</md-icon>
-              主页
-            </md-list-item>
+            <div class="nav-item-wrap">
+              <md-list-item type="button" @click="navigate('/')">
+                <md-icon slot="start">home</md-icon>
+                主页
+              </md-list-item>
+            </div>
             <md-divider></md-divider>
             <div class="list-subheader">设备列表</div>
-            <md-list-item
+            <div
               v-for="device in devices"
               :key="device.codename"
-              type="button"
-              @click="navigate(`/device/${device.codename}`)"
+              class="nav-item-wrap"
             >
-              <md-icon slot="start">smartphone</md-icon>
-              {{ device.name }} ({{ device.codename }})
-            </md-list-item>
+              <md-list-item
+                type="button"
+                @click="navigate(`/device/${device.codename}`)"
+              >
+                <md-icon slot="start">smartphone</md-icon>
+                {{ device.name }} ({{ device.codename }})
+              </md-list-item>
+            </div>
           </md-list>
         </nav>
       </div>
@@ -158,7 +164,6 @@ onUnmounted(() => {
 
 function navigate(path: string) {
   router.push(path);
-  drawerOpen.value = false;
 }
 </script>
 
@@ -178,7 +183,7 @@ function navigate(path: string) {
   display: flex;
   align-items: center;
   height: 64px;
-  padding: 0 4px 0 4px;
+  padding: 0 16px;
   background-color: var(--md-sys-color-surface);
   transition: box-shadow 200ms ease, background-color 200ms ease;
 }
@@ -252,10 +257,33 @@ function navigate(path: string) {
 }
 
 /* MD3 Navigation Drawer: pill-shaped (28 dp radius) item highlight, inset 12 px */
+.nav-item-wrap {
+  position: relative;
+  margin: 2px 12px;
+}
+
+/* Animated pill highlight — expands from centre on hover, shrinks on leave */
+.nav-item-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 28px;
+  background: color-mix(in srgb, var(--md-sys-color-on-surface) 8%, transparent);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.nav-item-wrap:hover::before {
+  transform: scaleX(1);
+}
+
 .navigation-drawer :deep(md-list-item) {
   border-radius: 28px;
-  margin: 2px 12px;
-  /* Remove default left/right padding so icon + label align nicely within the pill */
+  /* Disable built-in flat-opacity hover layer; our ::before provides the animation */
+  --md-list-item-hover-state-layer-opacity: 0;
   --md-list-item-leading-space: 16px;
   --md-list-item-trailing-space: 16px;
 }
