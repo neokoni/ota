@@ -15,52 +15,48 @@
       </md-icon-button>
     </header>
 
-    <!-- Drawer Scrim + Navigation Drawer (teleported to body so they always overlay) -->
-    <Teleport to="body">
-      <div
-        class="drawer-scrim"
-        :class="{ visible: drawerOpen }"
-        @click="drawerOpen = false"
-      ></div>
-
-      <!-- Navigation Drawer -->
-      <nav class="navigation-drawer" :class="{ open: drawerOpen }">
-        <div class="drawer-header">
-          <img src="https://res.neokoni.ink/neokoni/svg/favicon.svg" class="drawer-logo" alt="logo" />
-          <span class="drawer-title">OTA Center</span>
-        </div>
-        <md-list>
-          <md-list-item type="button" @click="navigate('/')">
-            <md-icon slot="start">home</md-icon>
-            主页
-          </md-list-item>
-          <md-divider></md-divider>
-          <div class="list-subheader">设备列表</div>
-          <md-list-item
-            v-for="device in devices"
-            :key="device.codename"
-            type="button"
-            @click="navigate(`/device/${device.codename}`)"
-          >
-            <md-icon slot="start">smartphone</md-icon>
-            {{ device.name }} ({{ device.codename }})
-          </md-list-item>
-        </md-list>
-      </nav>
-    </Teleport>
-
-    <!-- Main Content -->
-    <main class="layout-main">
-      <div class="content-area">
-        <router-view></router-view>
+    <!-- Body row: drawer + main content side by side (push layout, same layer) -->
+    <div class="body-row">
+      <!-- Navigation Drawer wrapper — animates width 0→280px to push content -->
+      <div class="drawer-wrapper" :class="{ open: drawerOpen }">
+        <nav class="navigation-drawer">
+          <div class="drawer-header">
+            <img src="https://res.neokoni.ink/neokoni/svg/favicon.svg" class="drawer-logo" alt="logo" />
+            <span class="drawer-title">OTA Center</span>
+          </div>
+          <md-list>
+            <md-list-item type="button" @click="navigate('/')">
+              <md-icon slot="start">home</md-icon>
+              主页
+            </md-list-item>
+            <md-divider></md-divider>
+            <div class="list-subheader">设备列表</div>
+            <md-list-item
+              v-for="device in devices"
+              :key="device.codename"
+              type="button"
+              @click="navigate(`/device/${device.codename}`)"
+            >
+              <md-icon slot="start">smartphone</md-icon>
+              {{ device.name }} ({{ device.codename }})
+            </md-list-item>
+          </md-list>
+        </nav>
       </div>
 
-      <footer class="site-footer">
-        <a v-for="(item, index) in siteConfig" :key="index" :href="item.icpLink" target="_blank" rel="noopener noreferrer">
-          {{ item.icp }}<br>
-        </a>
-      </footer>
-    </main>
+      <!-- Main Content -->
+      <main class="layout-main">
+        <div class="content-area">
+          <router-view></router-view>
+        </div>
+
+        <footer class="site-footer">
+          <a v-for="(item, index) in siteConfig" :key="index" :href="item.icpLink" target="_blank" rel="noopener noreferrer">
+            {{ item.icp }}<br>
+          </a>
+        </footer>
+      </main>
+    </div>
   </div>
 </template>
 
@@ -225,51 +221,34 @@ function navigate(path: string) {
   flex: 1;
 }
 
-/* Navigation Drawer */
-.drawer-scrim {
-  position: fixed;
-  inset: 0;
-  z-index: 200;
-  background: rgba(0, 0, 0, 0.32);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 300ms ease;
+/* Body row: drawer + main sit side-by-side, same layer */
+.body-row {
+  display: flex;
+  flex: 1;
 }
 
-.drawer-scrim.visible {
-  opacity: 1;
-  pointer-events: auto;
+/* Drawer wrapper animates width 0 → 280px to push main content */
+.drawer-wrapper {
+  flex-shrink: 0;
+  align-self: stretch;
+  width: 0;
+  overflow: hidden;
+  transition: width 300ms cubic-bezier(0.2, 0, 0, 1);
 }
 
-.navigation-drawer {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 300;
+.drawer-wrapper.open {
   width: 280px;
-  height: 100vh;
+}
+
+/* Navigation Drawer — in-flow, solid background */
+.navigation-drawer {
+  width: 280px;
+  min-height: 100%;
   background-color: var(--md-sys-color-surface-container-low);
   border-radius: 0 16px 16px 0;
-  transform: translateX(-100%);
-  visibility: hidden;
-  /* delay visibility:hidden until after the slide-out transition (300ms) so
-     content doesn't leak into viewport corners while the drawer is animating */
-  transition:
-    transform 300ms cubic-bezier(0.2, 0, 0, 1),
-    visibility 0s linear 300ms;
-  overflow: hidden;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
-  /* Make md-list transparent so the drawer's own background colour shows uniformly */
-  --md-list-container-color: transparent;
-}
-
-.navigation-drawer.open {
-  transform: translateX(0);
-  visibility: visible;
   overflow-y: auto;
-  transition:
-    transform 300ms cubic-bezier(0.2, 0, 0, 1),
-    visibility 0s linear 0s;
+  /* Make md-list transparent so the drawer's own background shows uniformly */
+  --md-list-container-color: transparent;
 }
 
 .drawer-header {
@@ -305,6 +284,7 @@ function navigate(path: string) {
 /* Main Layout */
 .layout-main {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
 }
