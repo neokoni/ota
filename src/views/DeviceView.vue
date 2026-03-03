@@ -55,6 +55,7 @@ function selectSystem(system: string) {
 .device-card {
   padding: 24px;
   width: 100%;
+  box-sizing: border-box;
   background-color: var(--md-sys-color-surface-container-low);
   border-radius: 16px;
   border: 1px solid var(--md-sys-color-outline-variant);
@@ -88,13 +89,12 @@ function selectSystem(system: string) {
   border-radius: 12px;
   background-color: var(--md-sys-color-surface-container-highest);
   border: 1px solid var(--md-sys-color-outline-variant);
-  transition: background-color 200ms ease, box-shadow 200ms ease;
+  transition: background-color 200ms ease;
   outline: none;
 }
 
 .system-item:hover {
   background-color: var(--md-sys-color-surface-variant);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 .system-item:focus-visible {
@@ -109,5 +109,19 @@ function selectSystem(system: string) {
 
 .chevron-icon {
   color: var(--md-sys-color-on-surface-variant);
+}
+
+@media (max-width: 600px) {
+  .device-view {
+    padding: 12px;
+  }
+
+  .device-card {
+    padding: 16px;
+  }
+
+  .device-card h1 {
+    font-size: 1.25rem;
+  }
 }
 </style>

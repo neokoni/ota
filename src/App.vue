@@ -264,12 +264,11 @@ function navigate(path: string) {
   position: relative;
   margin: 2px 12px;
   border-radius: 28px;
-  transition: box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background 200ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .nav-item-wrap:hover {
   background: color-mix(in srgb, var(--md-sys-color-on-surface) 8%, transparent);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
 .navigation-drawer :deep(md-list-item) {

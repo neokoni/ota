@@ -64,6 +64,7 @@ function selectVersion(version: string) {
 .system-card {
   padding: 24px;
   width: 100%;
+  box-sizing: border-box;
   background-color: var(--md-sys-color-surface-container-low);
   border-radius: 16px;
   border: 1px solid var(--md-sys-color-outline-variant);
@@ -105,13 +106,12 @@ function selectVersion(version: string) {
   border-radius: 12px;
   background-color: var(--md-sys-color-surface-container-highest);
   border: 1px solid var(--md-sys-color-outline-variant);
-  transition: background-color 200ms ease, box-shadow 200ms ease;
+  transition: background-color 200ms ease;
   outline: none;
 }
 
 .version-item:hover {
   background-color: var(--md-sys-color-surface-variant);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 .version-item:focus-visible {
@@ -131,5 +131,15 @@ function selectVersion(version: string) {
 
 .chevron-icon {
   color: var(--md-sys-color-on-surface-variant);
+}
+
+@media (max-width: 600px) {
+  .system-view {
+    padding: 12px;
+  }
+
+  .system-card {
+    padding: 16px;
+  }
 }
 </style>
