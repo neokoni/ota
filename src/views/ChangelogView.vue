@@ -1,7 +1,9 @@
 <template>
   <div class="changelog-view">
     <div class="header-section">
-      <mdui-button-icon icon="arrow_back--two-tone" @click="$router.back()"></mdui-button-icon>
+      <md-icon-button @click="$router.back()">
+        <md-icon>arrow_back</md-icon>
+      </md-icon-button>
       <div>
         <h1>{{ deviceName }}</h1>
         <a v-if="otaUrl" :href="otaUrl" target="_blank" class="json-link">查看系统更新文件 (JSON)</a>
@@ -11,23 +13,23 @@
 
     <div class="changelog-list">
       <template v-if="changelogData">
-        <mdui-card 
-          v-for="(release, index) in changelogData.releases" 
+        <div
+          v-for="(release, index) in changelogData.releases"
           :key="release.date"
-          class="changelog-card" 
-          :variant="index === 0 ? 'filled' : 'elevated'"
+          class="changelog-card"
+          :class="index === 0 ? 'changelog-card--filled' : 'changelog-card--elevated'"
         >
           <div class="card-header">
             <h3>{{ release.date }}</h3>
-            <mdui-chip v-if="index === 0" variant="filter" selected>最新</mdui-chip>
+            <md-filter-chip v-if="index === 0" label="最新" selected></md-filter-chip>
           </div>
-          <mdui-divider></mdui-divider>
+          <md-divider></md-divider>
           <div class="card-body">
             <ul>
-              <li v-for="(change, idx) in release.changes" :key="idx"  v-html="change"></li>
+              <li v-for="(change, idx) in release.changes" :key="idx" v-html="change"></li>
             </ul>
           </div>
-        </mdui-card>
+        </div>
       </template>
       <div v-else class="state-container">
         <p>未找到更新日志</p>
@@ -79,12 +81,13 @@ const changelogData = computed(() => {
 .header-section h1 {
   margin: 0;
   font-size: 1.75rem;
+  color: var(--md-sys-color-on-surface);
 }
 
 .json-link {
   display: block;
   font-size: 0.875rem;
-  color: rgb(var(--mdui-color-primary));
+  color: var(--md-sys-color-primary);
   text-decoration: none;
   margin-top: 4px;
 }
@@ -95,7 +98,7 @@ const changelogData = computed(() => {
 
 .subtitle {
   margin: 4px 0 0 0;
-  opacity: 0.7;
+  color: var(--md-sys-color-on-surface-variant);
 }
 
 .changelog-list {
@@ -108,10 +111,24 @@ const changelogData = computed(() => {
   display: flex;
   justify-content: center;
   padding: 40px;
+  color: var(--md-sys-color-on-surface-variant);
 }
 
 .changelog-card {
   width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.changelog-card--filled {
+  background-color: var(--md-sys-color-primary-container);
+  border: 1px solid transparent;
+}
+
+.changelog-card--elevated {
+  background-color: var(--md-sys-color-surface-container-low);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
 }
 
 .card-header {
@@ -124,6 +141,11 @@ const changelogData = computed(() => {
 .card-header h3 {
   margin: 0;
   font-size: 1.1rem;
+  color: var(--md-sys-color-on-surface);
+}
+
+.changelog-card--filled .card-header h3 {
+  color: var(--md-sys-color-on-primary-container);
 }
 
 .card-body {
@@ -138,6 +160,11 @@ const changelogData = computed(() => {
 .card-body li {
   margin-bottom: 8px;
   line-height: 1.5;
+  color: var(--md-sys-color-on-surface);
+}
+
+.changelog-card--filled .card-body li {
+  color: var(--md-sys-color-on-primary-container);
 }
 
 .card-body li:last-child {

@@ -1,15 +1,19 @@
 :root {
-  --mdui-font-family: 'Roboto', 'Noto Sans SC', sans-serif;
+  --font-family: 'Roboto', 'Noto Sans SC', sans-serif;
 }
 
 body {
-  font-family: var(--mdui-font-family);
+  font-family: var(--font-family);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  overflow-x: hidden;
+  background-color: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
 }
 
 code { /* from https://developer.mozilla.org/zh-CN/docs/Web/HTML/Reference/Elements/code */
-  background-color: rgba(var(--mdui-color-on-surface-variant), .28);
+  background-color: color-mix(in srgb, var(--md-sys-color-on-surface-variant) 28%, transparent);
   border-radius: 3px;
   padding: 0 3px;
 }
