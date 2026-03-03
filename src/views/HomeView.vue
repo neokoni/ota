@@ -51,6 +51,22 @@
   line-height: 1.6;
 }
 
+@media (max-width: 840px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .hero-title {
+    font-size: 1.75rem;
+  }
+
+  .hero-description {
+    font-size: 1rem;
+  }
+}
+
 .hero-actions {
   display: flex;
   gap: 16px;

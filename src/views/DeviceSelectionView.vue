@@ -40,8 +40,14 @@ import { devices } from '@/config/devices';
 
 .device-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 16px;
+}
+
+@media (max-width: 600px) {
+  .device-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .device-card {
@@ -55,14 +61,12 @@ import { devices } from '@/config/devices';
   border-radius: 12px;
   background-color: var(--md-sys-color-surface-container-low);
   border: 1px solid var(--md-sys-color-outline-variant);
-  transition: background-color 200ms ease, box-shadow 200ms ease, transform 150ms ease;
+  transition: background-color 200ms ease;
   outline: none;
 }
 
 .device-card:hover {
   background-color: var(--md-sys-color-surface-container);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-  transform: translateY(-1px);
 }
 
 .device-card:focus-visible {
