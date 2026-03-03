@@ -20,10 +20,6 @@
       <!-- Navigation Drawer wrapper — animates width 0→280px to push content -->
       <div class="drawer-wrapper" :class="{ open: drawerOpen }">
         <nav class="navigation-drawer">
-          <div class="drawer-header">
-            <img src="https://res.neokoni.ink/neokoni/svg/favicon.svg" class="drawer-logo" alt="logo" />
-            <span class="drawer-title">OTA Center</span>
-          </div>
           <md-list>
             <md-list-item type="button" @click="navigate('/')">
               <md-icon slot="start">home</md-icon>
@@ -63,7 +59,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { themeFromImage, applyTheme } from '@material/material-color-utilities';
+import { themeFromImage, themeFromSourceColor, applyTheme } from '@material/material-color-utilities';
 import type { Theme } from '@material/material-color-utilities';
 import { devices } from '@/config/devices';
 import { siteConfig, wallpaperConfig } from '@/config/site';
@@ -136,6 +132,9 @@ async function initDynamicColors() {
     console.log('Dynamic color applied from wallpaper');
   } catch (error) {
     console.warn('Dynamic color initialization failed:', error);
+    // Apply MD3 baseline purple theme as fallback so surface tokens are defined
+    loadedTheme = themeFromSourceColor(0xFF6750A4);
+    applyCurrentTheme(loadedTheme, themeMode.value);
   }
 }
 
@@ -247,29 +246,18 @@ function navigate(path: string) {
   background-color: var(--md-sys-color-surface-container-low);
   border-radius: 0 16px 16px 0;
   overflow-y: auto;
-  /* Make md-list transparent so the drawer's own background shows uniformly */
+  padding-top: 12px;
+  /* Transparent md-list background so drawer colour shows uniformly */
   --md-list-container-color: transparent;
 }
 
-.drawer-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 24px 16px 16px;
-  border-bottom: 1px solid var(--md-sys-color-outline-variant);
-  margin-bottom: 8px;
-}
-
-.drawer-logo {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-}
-
-.drawer-title {
-  font-size: 1.125rem;
-  font-weight: 500;
-  color: var(--md-sys-color-on-surface-variant);
+/* MD3 Navigation Drawer: pill-shaped (28 dp radius) item highlight, inset 12 px */
+.navigation-drawer :deep(md-list-item) {
+  border-radius: 28px;
+  margin: 2px 12px;
+  /* Remove default left/right padding so icon + label align nicely within the pill */
+  --md-list-item-leading-space: 16px;
+  --md-list-item-trailing-space: 16px;
 }
 
 .list-subheader {
@@ -279,6 +267,12 @@ function navigate(path: string) {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--md-sys-color-on-surface-variant);
+}
+
+/* Give the divider some breathing room and use the outline-variant token */
+.navigation-drawer :deep(md-divider) {
+  margin: 8px 0;
+  --md-divider-color: var(--md-sys-color-outline-variant);
 }
 
 /* Main Layout */
