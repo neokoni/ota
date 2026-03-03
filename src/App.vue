@@ -183,7 +183,7 @@ function navigate(path: string) {
   display: flex;
   align-items: center;
   height: 64px;
-  padding: 0 16px;
+  padding: 0 24px;
   background-color: var(--md-sys-color-surface);
   transition: box-shadow 200ms ease, background-color 200ms ease;
 }
@@ -259,6 +259,9 @@ function navigate(path: string) {
 /* MD3 Navigation Drawer: pill-shaped (28 dp radius) item highlight, inset 12 px */
 .nav-item-wrap {
   position: relative;
+  /* z-index: 0 creates a local stacking context so ::before at z-index:-1
+     sits below the list item content but above the drawer background */
+  z-index: 0;
   margin: 2px 12px;
 }
 
@@ -269,7 +272,7 @@ function navigate(path: string) {
   inset: 0;
   border-radius: 28px;
   background: color-mix(in srgb, var(--md-sys-color-on-surface) 8%, transparent);
-  transform: scaleX(0);
+  transform: scale(0);
   transform-origin: center;
   transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
@@ -277,7 +280,7 @@ function navigate(path: string) {
 }
 
 .nav-item-wrap:hover::before {
-  transform: scaleX(1);
+  transform: scale(1);
 }
 
 .navigation-drawer :deep(md-list-item) {
