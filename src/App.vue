@@ -15,6 +15,9 @@
       </md-icon-button>
     </header>
 
+    <!-- Backdrop overlay for mobile drawer -->
+    <div class="drawer-backdrop" :class="{ visible: drawerOpen }" @click="drawerOpen = false"></div>
+
     <!-- Body row: drawer + main content side by side (push layout, same layer) -->
     <div class="body-row">
       <!-- Navigation Drawer wrapper — animates width 0→280px to push content -->
@@ -259,33 +262,19 @@ function navigate(path: string) {
 /* MD3 Navigation Drawer: pill-shaped (28 dp radius) item highlight, inset 12 px */
 .nav-item-wrap {
   position: relative;
-  /* z-index: 0 creates a local stacking context so ::before at z-index:-1
-     sits below the list item content but above the drawer background */
-  z-index: 0;
   margin: 2px 12px;
-}
-
-/* Animated pill highlight — expands from centre on hover, shrinks on leave */
-.nav-item-wrap::before {
-  content: '';
-  position: absolute;
-  inset: 0;
   border-radius: 28px;
-  background: color-mix(in srgb, var(--md-sys-color-on-surface) 8%, transparent);
-  transform: scale(0);
-  transform-origin: center;
-  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
-  pointer-events: none;
-  z-index: -1;
+  transition: box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.nav-item-wrap:hover::before {
-  transform: scale(1);
+.nav-item-wrap:hover {
+  background: color-mix(in srgb, var(--md-sys-color-on-surface) 8%, transparent);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
 .navigation-drawer :deep(md-list-item) {
   border-radius: 28px;
-  /* Disable built-in flat-opacity hover layer; our ::before provides the animation */
+  /* Disable built-in flat-opacity hover layer; our .nav-item-wrap provides the hover styles */
   --md-list-item-hover-state-layer-opacity: 0;
   --md-list-item-leading-space: 16px;
   --md-list-item-trailing-space: 16px;
@@ -336,9 +325,58 @@ function navigate(path: string) {
   text-decoration: underline;
 }
 
-@media (max-width: 600px) {
+/* Drawer backdrop for mobile overlay */
+.drawer-backdrop {
+  display: none;
+}
+
+@media (max-width: 840px) {
   .app-bar-title {
     font-size: 1.1rem;
+  }
+
+  .drawer-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 49;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 300ms ease;
+  }
+
+  .drawer-backdrop.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Overlay drawer on mobile — floats above content instead of pushing it */
+  .drawer-wrapper {
+    position: fixed;
+    top: 64px;
+    left: 0;
+    height: calc(100vh - 64px);
+    z-index: 50;
+    overflow: hidden;
+  }
+
+  .drawer-wrapper.open {
+    box-shadow: 4px 0 16px rgba(0, 0, 0, 0.2);
+  }
+
+  .navigation-drawer {
+    border-radius: 0 16px 16px 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .app-bar-title {
+    font-size: 1rem;
+  }
+
+  .top-app-bar {
+    padding: 0 8px;
   }
 }
 </style>
