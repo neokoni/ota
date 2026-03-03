@@ -14,6 +14,7 @@
     "type-check": "vue-tsc --build"
   },
   "dependencies": {
+    "@fontsource-variable/material-symbols-rounded": "^5.2.37",
     "@fontsource/noto-sans-sc": "^5.2.8",
     "@fontsource/roboto": "^5.2.9",
     "@material/material-color-utilities": "^0.4.0",

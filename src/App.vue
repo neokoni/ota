@@ -15,37 +15,39 @@
       </md-icon-button>
     </header>
 
-    <!-- Drawer Scrim -->
-    <div
-      class="drawer-scrim"
-      :class="{ visible: drawerOpen }"
-      @click="drawerOpen = false"
-    ></div>
+    <!-- Drawer Scrim + Navigation Drawer (teleported to body so they always overlay) -->
+    <Teleport to="body">
+      <div
+        class="drawer-scrim"
+        :class="{ visible: drawerOpen }"
+        @click="drawerOpen = false"
+      ></div>
 
-    <!-- Navigation Drawer -->
-    <nav class="navigation-drawer" :class="{ open: drawerOpen }">
-      <div class="drawer-header">
-        <img src="https://res.neokoni.ink/neokoni/svg/favicon.svg" class="drawer-logo" alt="logo" />
-        <span class="drawer-title">OTA Center</span>
-      </div>
-      <md-list>
-        <md-list-item type="button" @click="navigate('/')">
-          <md-icon slot="start">home</md-icon>
-          主页
-        </md-list-item>
-        <md-divider></md-divider>
-        <div class="list-subheader">设备列表</div>
-        <md-list-item
-          v-for="device in devices"
-          :key="device.codename"
-          type="button"
-          @click="navigate(`/device/${device.codename}`)"
-        >
-          <md-icon slot="start">smartphone</md-icon>
-          {{ device.name }} ({{ device.codename }})
-        </md-list-item>
-      </md-list>
-    </nav>
+      <!-- Navigation Drawer -->
+      <nav class="navigation-drawer" :class="{ open: drawerOpen }">
+        <div class="drawer-header">
+          <img src="https://res.neokoni.ink/neokoni/svg/favicon.svg" class="drawer-logo" alt="logo" />
+          <span class="drawer-title">OTA Center</span>
+        </div>
+        <md-list>
+          <md-list-item type="button" @click="navigate('/')">
+            <md-icon slot="start">home</md-icon>
+            主页
+          </md-list-item>
+          <md-divider></md-divider>
+          <div class="list-subheader">设备列表</div>
+          <md-list-item
+            v-for="device in devices"
+            :key="device.codename"
+            type="button"
+            @click="navigate(`/device/${device.codename}`)"
+          >
+            <md-icon slot="start">smartphone</md-icon>
+            {{ device.name }} ({{ device.codename }})
+          </md-list-item>
+        </md-list>
+      </nav>
+    </Teleport>
 
     <!-- Main Content -->
     <main class="layout-main">
@@ -257,6 +259,8 @@ function navigate(path: string) {
     visibility 0s linear 300ms;
   overflow: hidden;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+  /* Make md-list transparent so the drawer's own background colour shows uniformly */
+  --md-list-container-color: transparent;
 }
 
 .navigation-drawer.open {

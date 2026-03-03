@@ -1,5 +1,7 @@
 :root {
   --font-family: 'Roboto', 'Noto Sans SC', sans-serif;
+  /* Make md-icon use the self-hosted Material Symbols Rounded variable font */
+  --md-icon-font: 'Material Symbols Rounded Variable';
 }
 
 body {
