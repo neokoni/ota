@@ -1,42 +1,42 @@
-# ota_site
+# Neokoni's OTA Center
 
-This template should help get you started developing with Vue 3 in Vite.
+自托管的 OTA（空中升级）信息站点，展示 Neokoni ROM 构建的更新记录。
 
-## Recommended IDE Setup
+🔗 线上地址：**https://ota.neokoni.ink**
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## 技术栈
 
-## Recommended Browser Setup
+- [Vue 3](https://vuejs.org/) + TypeScript（Composition API + `<script setup>`）
+- [Vite](https://vite.dev/) 构建工具
+- [@material/web 2](https://github.com/material-components/material-web)（Google 官方 Material Design 3 Web 组件）
+- [Vue Router 4](https://router.vuejs.org/)（HTML5 History 模式）
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd) 
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
-
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
+## 快速开始
 
 ```sh
 npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
 npm run dev
 ```
 
-### Type-Check, Compile and Minify for Production
+浏览器访问 `http://localhost:5173`。
 
-```sh
-npm run build
-```
+## 可用命令
+
+| 命令 | 说明 |
+|------|------|
+| `npm run dev` | 启动本地开发服务器（支持热重载） |
+| `npm run build` | 类型检查 + 构建生产版本（输出到 `dist/`） |
+| `npm run type-check` | 仅运行 TypeScript 类型检查 |
+| `npm run preview` | 预览生产构建结果 |
+
+## 文档
+
+详细文档请参阅 [`docs/`](./docs/) 目录：
+
+- [快速入门](./docs/getting-started.md)
+- [项目架构](./docs/architecture.md)
+- [添加设备](./docs/adding-devices.md)
+- [OTA JSON 格式](./docs/ota-json-format.md)
+- [生成 OTA JSON](./docs/generate-ota-json.md)
+- [部署](./docs/deployment.md)
+

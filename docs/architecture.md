@@ -35,6 +35,7 @@ ota/
 │   └── main.ts                     # 应用入口
 ├── docs/                           # 项目文档
 ├── .github/
+│   ├── copilot-instructions.md     # Copilot AI 助手上下文配置
 │   └── workflows/
 │       └── deployment.yml          # CI/CD 自动部署工作流
 ├── index.html                      # HTML 入口文件
@@ -48,11 +49,11 @@ ota/
 
 | 技术 | 版本 | 用途 |
 |------|------|------|
-| Vue 3 | 3.5.x | 前端框架（Composition API） |
+| Vue 3 | 3.5.x | 前端框架（Composition API + `<script setup>`） |
 | TypeScript | ~5.9 | 类型系统 |
 | Vite | ^7.x | 构建工具与开发服务器 |
 | Vue Router 4 | ^4.6 | 客户端路由 |
-| MDUI 2 | ^2.1 | Material Design 3 UI 组件库 |
+| @material/web | ^2.4.1 | Material Web Components（Google 官方 Material Design 3 Web 组件） |
 | Roboto / Noto Sans SC | — | 字体（中英文） |
 
 ## 路由结构
@@ -83,10 +84,10 @@ src/config/devices.ts   ← import.meta.glob 动态加载所有 JSON
 
 ## App.vue 根组件功能
 
-- **顶部应用栏**：品牌名称、菜单按钮、主题切换按钮
+- **顶部应用栏**：品牌 logo + 名称（点击返回首页）、菜单按钮、主题切换按钮
 - **侧边抽屉导航**：首页入口 + 所有设备快捷链接（自动从 `devices` 配置生成）
 - **主题模式**：支持 `auto` / `light` / `dark` 三档，偏好保存到 `localStorage`
-- **动态配色**：通过必应壁纸 API 提取主色调，调用 MDUI 的 `setColorScheme` 动态换肤
+- **动态配色**：通过必应壁纸 API 提取主色调，调用 `@material/material-color-utilities` 的 `applyTheme()` 动态换肤
 
 ## Vite 自定义插件
 
@@ -125,3 +126,51 @@ src/config/devices.ts   ← import.meta.glob 动态加载所有 JSON
 
 - **`siteConfig`**：页脚 ICP 备案信息数组，每项包含 `icp`（备案号）和 `icpLink`（链接）
 - **`wallpaperConfig`**：壁纸 API 地址，用于动态配色初始化
+
+## UI / CSS 设计惯例
+
+### 悬停效果
+
+所有可交互元素（导航项、设备卡片、系统项、版本项）的悬停效果**仅使用 `background-color` 过渡**，禁止使用 `box-shadow` 或 `transform: translateY`：
+
+```css
+/* 正确 */
+transition: background-color 200ms ease;
+.item:hover { background-color: var(--md-sys-color-surface-variant); }
+
+/* 禁止——不使用 box-shadow 或 transform 作为 hover 效果 */
+```
+
+### 卡片盒模型
+
+包含 `padding` 的卡片和容器必须设置 `box-sizing: border-box`，防止宽度超出视口（尤其在移动端）：
+
+```css
+.device-card, .system-card {
+  width: 100%;
+  padding: 24px;
+  box-sizing: border-box; /* 必须，否则 375px 视口会溢出 */
+}
+```
+
+### 移动端适配
+
+在 `@media (max-width: 600px)` 断点下，减少容器和卡片的内边距以充分利用屏幕空间：
+
+```css
+@media (max-width: 600px) {
+  .view-container { padding: 12px; }
+  .card { padding: 16px; }
+}
+```
+
+### 焦点样式
+
+键盘导航可访问性使用 `:focus-visible`：
+
+```css
+.item:focus-visible {
+  outline: 3px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
+}
+```
