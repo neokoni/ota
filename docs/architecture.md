@@ -35,6 +35,7 @@ ota/
 │   └── main.ts                     # 应用入口
 ├── docs/                           # 项目文档
 ├── .github/
+│   ├── copilot-instructions.md     # Copilot AI 助手上下文配置
 │   └── workflows/
 │       └── deployment.yml          # CI/CD 自动部署工作流
 ├── index.html                      # HTML 入口文件
@@ -48,7 +49,7 @@ ota/
 
 | 技术 | 版本 | 用途 |
 |------|------|------|
-| Vue 3 | 3.5.x | 前端框架（Composition API） |
+| Vue 3 | 3.5.x | 前端框架（Composition API + `<script setup>`） |
 | TypeScript | ~5.9 | 类型系统 |
 | Vite | ^7.x | 构建工具与开发服务器 |
 | Vue Router 4 | ^4.6 | 客户端路由 |
@@ -83,7 +84,7 @@ src/config/devices.ts   ← import.meta.glob 动态加载所有 JSON
 
 ## App.vue 根组件功能
 
-- **顶部应用栏**：品牌名称、菜单按钮、主题切换按钮
+- **顶部应用栏**：品牌 logo + 名称（点击返回首页）、菜单按钮、主题切换按钮
 - **侧边抽屉导航**：首页入口 + 所有设备快捷链接（自动从 `devices` 配置生成）
 - **主题模式**：支持 `auto` / `light` / `dark` 三档，偏好保存到 `localStorage`
 - **动态配色**：通过必应壁纸 API 提取主色调，调用 `@material/material-color-utilities` 的 `applyTheme()` 动态换肤
