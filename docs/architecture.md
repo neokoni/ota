@@ -52,7 +52,7 @@ ota/
 | TypeScript | ~5.9 | 类型系统 |
 | Vite | ^7.x | 构建工具与开发服务器 |
 | Vue Router 4 | ^4.6 | 客户端路由 |
-| MDUI 2 | ^2.1 | Material Design 3 UI 组件库 |
+| @material/web | ^2.4.1 | Material Web Components（Google 官方 Material Design 3 Web 组件） |
 | Roboto / Noto Sans SC | — | 字体（中英文） |
 
 ## 路由结构
@@ -86,7 +86,7 @@ src/config/devices.ts   ← import.meta.glob 动态加载所有 JSON
 - **顶部应用栏**：品牌名称、菜单按钮、主题切换按钮
 - **侧边抽屉导航**：首页入口 + 所有设备快捷链接（自动从 `devices` 配置生成）
 - **主题模式**：支持 `auto` / `light` / `dark` 三档，偏好保存到 `localStorage`
-- **动态配色**：通过必应壁纸 API 提取主色调，调用 MDUI 的 `setColorScheme` 动态换肤
+- **动态配色**：通过必应壁纸 API 提取主色调，调用 `@material/material-color-utilities` 的 `applyTheme()` 动态换肤
 
 ## Vite 自定义插件
 

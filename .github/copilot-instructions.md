@@ -14,7 +14,7 @@
 | TypeScript | ~5.9 | 类型系统 |
 | Vite | ^7.x | 构建工具与开发服务器 |
 | Vue Router 4 | ^4.6 | 客户端路由（HTML5 History 模式） |
-| MDUI 2 | ^2.1 | Material Design 3 UI 组件库 |
+| @material/web | ^2.4.1 | Material Web Components（Google 官方 Material Design 3 Web 组件） |
 
 ## 目录结构
 
@@ -101,7 +101,7 @@ src/ota/*.json
   ```
 - **卡片盒模型**：包含 `padding` 的卡片/容器必须设置 `box-sizing: border-box`，防止移动端溢出
 - **移动端适配**：`@media (max-width: 600px)` 减少容器和卡片的 `padding`
-- **颜色系统**：使用 `var(--md-sys-color-*)` CSS 变量（MDUI 2 / Material Design 3 token），在 `main.css` 中有静态回退值，运行时由 `applyTheme()` 动态覆盖
+- **颜色系统**：使用 `var(--md-sys-color-*)` CSS 变量（@material/web / Material Design 3 token），在 `main.css` 中有静态回退值，运行时由 `applyTheme()` 动态覆盖
 - **焦点样式**：使用 `:focus-visible { outline: 3px solid var(--md-sys-color-primary); }` 键盘导航可访问性
 
 ## App.vue 核心功能
@@ -109,7 +109,7 @@ src/ota/*.json
 - **顶部栏**：品牌 logo + 名称（点击返回首页）、菜单按钮、主题切换按钮
 - **侧边抽屉**：首页入口 + 所有设备快捷链接（从 `devices` 配置自动生成）；移动端使用半透明遮罩 + push 布局
 - **主题模式**：`auto` / `light` / `dark`，偏好存入 `localStorage`
-- **动态配色**：从必应壁纸 API（`wallpaperConfig.api`）提取主色调，调用 `applyTheme()` / `setColorScheme()` 换肤
+- **动态配色**：从必应壁纸 API（`wallpaperConfig.api`）提取主色调，调用 `applyTheme()` 换肤
 
 ## Vite 自定义插件（vite.config.ts）
 

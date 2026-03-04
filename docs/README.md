@@ -26,6 +26,6 @@
 
 - **前端框架**：[Vue 3](https://vuejs.org/) + TypeScript
 - **构建工具**：[Vite](https://vite.dev/)
-- **UI 组件库**：[MDUI 2](https://www.mdui.org/)（Material Design 3）
+- **UI 组件库**：[@material/web 2](https://github.com/material-components/material-web)（Material Web Components，Google 官方 Material Design 3）
 - **路由**：[Vue Router 4](https://router.vuejs.org/)
 - **CI/CD**：GitHub Actions + SSH 部署
