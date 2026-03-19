@@ -11,6 +11,16 @@
           "otaUrl": "/AviumUI/avium-16/lemonades/ota.json",
           "releases": [
             {
+              "date": "2026-03-19",
+              "changes": [
+                "上游代码:",
+                "1. 更新AviumUI",
+                "内核:",
+                "1. 更新KernelSU",
+                "2. 更新上游"
+              ]
+            },
+            {
               "date": "2026-02-26",
               "changes": [
                 "上游代码:",
