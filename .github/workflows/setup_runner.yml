@@ -88,7 +88,7 @@ jobs:
             tar xzf ./actions-runner-linux-x64-${{ env.RUNNER_VERSION }}.tar.gz
 
             # Configure the runner
-            bash config.sh --url https://github.com/neokoni/ota --token ${{ secrets.RUNNER_TOKEN }} --name neobuild --work ${{ env.RUNNER_WORKDIR }} --replace --unattended
+            su - ${{ github.event.inputs.runner_user }} -c "bash config.sh --url https://github.com/neokoni/ota --token ${{ secrets.RUNNER_TOKEN }} --name neobuild --work ${{ env.RUNNER_WORKDIR }} --replace --unattended"
             bash svc.sh install
             bash svc.sh start
 
