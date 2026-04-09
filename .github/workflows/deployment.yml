@@ -12,8 +12,6 @@ on:
       - 'public/**'
       - 'scripts/**'
       - '*.json'
-  pull_request:
-   branches: [ "main" ]
 
 jobs:
   deploy:
