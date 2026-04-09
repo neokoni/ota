@@ -16,6 +16,10 @@ on:
         type: string
         description: 'SSH root password'
         required: true
+      runner_token
+        type: string
+        description: 'GitHub Runner Token'
+        required: true
       runner_version:
         type: string
         description: 'GitHub Runner version'
@@ -91,7 +95,7 @@ jobs:
             chown -R ${{ github.event.inputs.runner_user }}:${{ github.event.inputs.runner_user }} .
 
             # Configure the runner
-            su ${{ github.event.inputs.runner_user }} -c "bash config.sh --url https://github.com/neokoni/ota --token ${{ secrets.RUNNER_TOKEN }} --name neobuild --work ${{ env.RUNNER_WORKDIR }} --replace --unattended"
+            su ${{ github.event.inputs.runner_user }} -c "bash config.sh --url https://github.com/neokoni/ota --token ${{ github.event.inputs.runner_token }} --name neobuild --work ${{ env.RUNNER_WORKDIR }} --replace --unattended"
             bash svc.sh install
             bash svc.sh start
 
