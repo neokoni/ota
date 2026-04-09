@@ -16,7 +16,7 @@ on:
         type: string
         description: 'SSH root password'
         required: true
-      runner_token
+      runner_token:
         type: string
         description: 'GitHub Runner Token'
         required: true
