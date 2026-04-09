@@ -82,13 +82,13 @@ jobs:
             chown -R ${{ github.event.inputs.runner_user }}:${{ github.event.inputs.runner_user }} ${{ github.event.inputs.runner_workdir }}
           
             # Get GitHub Runner
-            echo "Installing GitHub Runner version ${{ github.env.RUNNER_VERSION }}"
+            echo "Installing GitHub Runner version ${{ env.RUNNER_VERSION }}"
             mkdir -p actions-runner && cd actions-runner
-            curl -O -L https://github.com/actions/runner/releases/download/v${{ github.env.RUNNER_VERSION }}/actions-runner-linux-x64-${{ github.env.RUNNER_VERSION }}.tar.gz
-            tar xzf ./actions-runner-linux-x64-${{ github.env.RUNNER_VERSION }}.tar.gz
+            curl -O -L https://github.com/actions/runner/releases/download/v${{ env.RUNNER_VERSION }}/actions-runner-linux-x64-${{ env.RUNNER_VERSION }}.tar.gz
+            tar xzf ./actions-runner-linux-x64-${{ env.RUNNER_VERSION }}.tar.gz
 
             # Configure the runner
-            bash config.sh --url https://github.com/neokoni/ota --token ${{ secrets.RUNNER_TOKEN }} --name neobuild --work ${{ github.env.RUNNER_WORKDIR }} --replace --unattended
+            bash config.sh --url https://github.com/neokoni/ota --token ${{ secrets.RUNNER_TOKEN }} --name neobuild --work ${{ env.RUNNER_WORKDIR }} --replace --unattended
             bash svc.sh install
             bash svc.sh start
 
