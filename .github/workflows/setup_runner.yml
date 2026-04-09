@@ -42,7 +42,7 @@ jobs:
     steps:
       - name: Setup Github Runner Version
         run: |
-          if [ ${{ github.event.inputs.runner_version }} == 'latest'];
+          if [[ ${{ github.event.inputs.runner_version }} == 'latest' ]];
           then
             echo "Using latest GitHub Runner version"
             RUNNER_VERSION=$(curl -s https://api.github.com/repos/actions/runner/releases/latest | grep 'tag_name' | cut -d\" -f4 | sed 's/v//')
