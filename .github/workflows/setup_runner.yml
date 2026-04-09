@@ -12,18 +12,15 @@ on:
         description: 'SSH port'
         required: false
         default: '22'
-      username:
-        type: string
-        description: 'SSH username'
-        required: true
       password:
         type: string
-        description: 'SSH password'
+        description: 'SSH root password'
         required: true
       runner_version:
         type: string
         description: 'GitHub Runner version'
         required: false
+        default: 'latest'
       runner_workdir:
         type: string
         description: 'GitHub Runner work directory'
@@ -34,6 +31,10 @@ on:
         description: 'GitHub Runner user'
         required: false
         default: 'neokoni'
+      mount_disk:
+        type: string
+        description: 'Should mount additional disk, fill disk path if true'
+        required: false
 
 jobs:
   setup_runner:
@@ -60,7 +61,7 @@ jobs:
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ github.event.inputs.host }}
-          username: ${{ github.event.inputs.username }}
+          username: root
           password: ${{ github.event.inputs.password }}
           port: ${{ github.event.inputs.port }}
           script: |
@@ -68,17 +69,26 @@ jobs:
 
             # Setup User and Workdir
             useradd -m -s /bin/bash ${{ github.event.inputs.runner_user }} || true
-            mkdir -p ${{ github.event.inputs.runner_workdir }}
+            mkdir -p ${{ github.event.inputs.runner_workdir }} || true
+
+            if [ -z ${{ github.event.inputs.mount_disk }} ]; then
+              echo "No additional disk to mount"
+            else
+              echo "Mounting additional disk at ${{ github.event.inputs.mount_disk }}"
+              mkfs.btrfs -f /dev/${{ github.event.inputs.mount_disk }}
+              mount /dev/${{ github.event.inputs.mount_disk }} ${{ github.event.inputs.runner_workdir }} -o noatime,compress=zstd
+            fi
+
             chown -R ${{ github.event.inputs.runner_user }}:${{ github.event.inputs.runner_user }} ${{ github.event.inputs.runner_workdir }}
           
             # Get GitHub Runner
-            echo "Installing GitHub Runner version $RUNNER_VERSION"
+            echo "Installing GitHub Runner version ${{ github.env.RUNNER_VERSION }}"
             mkdir -p actions-runner && cd actions-runner
-            curl -O -L https://github.com/actions/runner/releases/download/v$RUNNER_VERSION/actions-runner-linux-x64-$RUNNER_VERSION.tar.gz
-            tar xzf ./actions-runner-linux-x64-$RUNNER_VERSION.tar.gz
+            curl -O -L https://github.com/actions/runner/releases/download/v${{ github.env.RUNNER_VERSION }}/actions-runner-linux-x64-${{ github.env.RUNNER_VERSION }}.tar.gz
+            tar xzf ./actions-runner-linux-x64-${{ github.env.RUNNER_VERSION }}.tar.gz
 
             # Configure the runner
-            bash config.sh --url https://github.com/neokoni/ota --token ${{ secrets.RUNNER_TOKEN }} --name neobuild --work $RUNNER_WORKDIR --replace --unattended
+            bash config.sh --url https://github.com/neokoni/ota --token ${{ secrets.RUNNER_TOKEN }} --name neobuild --work ${{ github.env.RUNNER_WORKDIR }} --replace --unattended
             bash svc.sh install
             bash svc.sh start
 
