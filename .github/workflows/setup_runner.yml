@@ -1,0 +1,98 @@
+name: deploy to server
+
+on:
+  workflow_dispatch:
+    inputs:
+      host:
+        type: string
+        description: 'Server host'
+        required: true
+      port:
+        type: string
+        description: 'SSH port'
+        required: false
+        default: '22'
+      username:
+        type: string
+        description: 'SSH username'
+        required: true
+      password:
+        type: string
+        description: 'SSH password'
+        required: true
+      runner_version:
+        type: string
+        description: 'GitHub Runner version'
+        required: false
+        default: 'latest'
+      runner_token:
+        type: string
+        description: 'GitHub Runner registration token'
+        required: false
+      runner_workdir:
+        type: string
+        description: 'GitHub Runner work directory'
+        required: false
+        default: '/aosp_build'
+      runner_user:
+        type: string
+        description: 'GitHub Runner user'
+        required: false
+        default: 'neokoni'
+
+jobs:
+  setup_runner:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Github Runner Version
+        run: |
+          if [ ${{ github.event.inputs.runner_version }} == 'latest']];
+          then
+            echo "Using latest GitHub Runner version"
+            RUNNER_VERSION=$(curl -s https://api.github.com/repos/actions/runner/releases/latest | grep 'tag_name' | cut -d\" -f4 | sed 's/v//')
+          else
+            echo "Using specified GitHub Runner version: ${{ github.event.inputs.runner_version }}"
+            RUNNER_VERSION=${{ github.event.inputs.runner_version }}
+          fi
+          echo "RUNNER_VERSION=$RUNNER_VERSION" >> $GITHUB_ENV
+      
+      - name: Setup GitHub Runner Token
+        run: |
+          if [ -z "${{ github.event.inputs.runner_token }}" ];
+          then
+            echo "No GitHub Runner token provided, using token from secrets"
+            RUNNER_TOKEN=${{ secrets.GITHUB_RUNNER_TOKEN }}
+          else
+            echo "Using provided GitHub Runner token"
+            RUNNER_TOKEN=${{ github.event.inputs.runner_token }}
+          fi
+          echo "RUNNER_TOKEN=$RUNNER_TOKEN" >> $GITHUB_ENV
+      - name: Setup User and Workdir
+        run: |
+          useradd -m -s /bin/bash ${{ github.event.inputs.runner_user }}
+          mkdir -p ${{ github.event.inputs.runner_workdir }}
+          chown -R ${{ github.event.inputs.runner_user }}:${{ github.event.inputs.runner_user }} ${{ github.event.inputs.runner_workdir }}
+          echo "RUNNER_USER=${{ github.event.inputs.runner_user }}" >> $GITHUB_ENV
+          echo "RUNNER_WORKDIR=${{ github.event.inputs.runner_workdir }}" >> $GITHUB_ENV
+
+      - name: Install GitHub Runner
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ github.event.inputs.host }}
+          username: ${{ github.event.inputs.username }}
+          password: ${{ github.event.inputs.password }}
+          port: ${{ github.event.inputs.port }}
+          script: |
+            #!/bin/bash
+            set -e
+            echo "Installing GitHub Runner version $RUNNER_VERSION"
+            mkdir -p actions-runner && cd actions-runner
+            curl -O -L https://github.com/actions/runner/releases/download/v$RUNNER_VERSION/actions-runner-linux-x64-$RUNNER_VERSION.tar.gz
+            tar xzf ./actions-runner-linux-x64-$RUNNER_VERSION.tar.gz
+
+            # Configure the runner
+            bash config.sh --url https://github.com/neokoni/ota --token $RUNNER_TOKEN --name neobuild --work $RUNNER_WORKDIR --replace --unattended
+            bash svc.sh install
+            bash svc.sh start
+
+  
