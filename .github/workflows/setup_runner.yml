@@ -61,6 +61,23 @@ jobs:
           echo "RUNNER_USER=${{ github.event.inputs.runner_user }}" >> $GITHUB_ENV
           echo "RUNNER_WORKDIR=${{ github.event.inputs.runner_workdir }}" >> $GITHUB_ENV
 
+      - name: Install AOSP Build Dependencies
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ github.event.inputs.host }}
+          username: root
+          password: ${{ github.event.inputs.password }}
+          port: ${{ github.event.inputs.port }}
+          script: |
+            #!/bin/bash
+
+            sudo apt update -y && sudo apt upgrade -y
+            sudo apt install -y git gnupg flex bison build-essential \
+              zip curl zlib1g-dev libc6-dev-i386 libncurses6 lib32ncurses-dev \
+              x11proto-core-dev libx11-dev lib32z1-dev libgl1-mesa-dev \
+              libxml2-utils xsltproc unzip fontconfig libssl-dev openjdk-8-jdk \
+              repo ccache git-lfs libelf-dev rsync
+
       - name: Install GitHub Runner
         uses: appleboy/ssh-action@v1
         with:
