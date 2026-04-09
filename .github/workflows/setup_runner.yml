@@ -69,7 +69,7 @@ jobs:
           echo "RUNNER_TOKEN=$RUNNER_TOKEN" >> $GITHUB_ENV
       - name: Setup User and Workdir
         run: |
-          useradd -m -s /bin/bash ${{ github.event.inputs.runner_user }}
+          useradd -m -s /bin/bash ${{ github.event.inputs.runner_user }} || true
           mkdir -p ${{ github.event.inputs.runner_workdir }}
           chown -R ${{ github.event.inputs.runner_user }}:${{ github.event.inputs.runner_user }} ${{ github.event.inputs.runner_workdir }}
           echo "RUNNER_USER=${{ github.event.inputs.runner_user }}" >> $GITHUB_ENV
