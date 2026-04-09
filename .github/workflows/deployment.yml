@@ -7,6 +7,11 @@ on:
   workflow_dispatch:
   push:
    branches: [ "main" ]
+   paths:
+      - 'src/**'
+      - 'public/**'
+      - 'scripts/**'
+      - '*.json'
   pull_request:
    branches: [ "main" ]
 
