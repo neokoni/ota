@@ -10,7 +10,7 @@ on:
       port:
         type: string
         description: 'SSH port'
-        required: false
+        required: true
         default: '22'
       password:
         type: string
@@ -24,12 +24,12 @@ on:
       runner_workdir:
         type: string
         description: 'GitHub Runner work directory'
-        required: false
+        required: true
         default: '/aosp_build'
       runner_user:
         type: string
         description: 'GitHub Runner user'
-        required: false
+        required: true
         default: 'neokoni'
       mount_disk:
         type: string
