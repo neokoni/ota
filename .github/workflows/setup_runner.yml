@@ -118,6 +118,7 @@ jobs:
             chown -R ${{ github.event.inputs.runner_user }}:${{ github.event.inputs.runner_user }} .
 
             # Configure the runner
+            echo "bash config.sh --url https://github.com/neokoni/ota --token ${{ github.event.inputs.runner_token }} --name neobuild --work ${{ env.RUNNER_WORKDIR }} --replace --unattended" >> setup.sh
             bash config.sh --url https://github.com/neokoni/ota --token ${{ github.event.inputs.runner_token }} --name neobuild --work ${{ env.RUNNER_WORKDIR }} --replace --unattended
             bash svc.sh install ${{ github.event.inputs.runner_user }}
             bash svc.sh start
