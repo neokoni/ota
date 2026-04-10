@@ -177,11 +177,16 @@ jobs:
       - name: Use Dev Upload Path
         if: ${{ github.event.inputs.build_type == 'dev' }}
         run: echo "UPLOAD_PATH=${{ env.UPLOAD_PATH}}/dev" >> $GITHUB_ENV
-        
+
+      - name: Setup Uploader
+        run: |
+          if [ ! -d uploader ]; then
+            git clone https://github.com/neokoni/openlist_upload uploader
+            pip install -r uploader/requirements.txt --break-system-packages
+          fi
+
       - name: Upload Artifacts to OpenList
         run: |
-          git clone https://github.com/neokoni/openlist_upload uploader
-          pip install -r uploader/requirements.txt --break-system-packages
           python3 uploader/openlist_upload.py "target/${{ matrix.device }}/*" \
             --base-url ${{ secrets.OPENLIST_HOST }} \
             --remote-dir "${{ env.UPLOAD_PATH }}/${{ matrix.device }}/avium16/${{ env.START_BUILD_TIME }}/" \
@@ -198,6 +203,8 @@ jobs:
         working-directory: ${{ needs.init_context.outputs.shared_workdir }}
     env:
       KSU_CONFIG: "arch/arm64/configs/vendor/ksu.config"
+      START_BUILD_TIME: ${{ needs.init_context.outputs.build_start_time }}
+      UPLOAD_PATH: "/OneDrive-Public"
     steps:
       - name: Build Non-Root Boot Images (lemonades)
         run: |
@@ -205,16 +212,18 @@ jobs:
           lunch lineage_lemonades-bp4a-user
           sed -i 's/y/n/g' kernel/oneplus/sm8250/${{ env.KSU_CONFIG }}
           mka bootimage -j${{ github.event.inputs.build_threads }}
+
       - name: Build Non-Root Boot Images (nabu)
         run: |
           source build/envsetup.sh
           sed -i 's/y/n/g' kernel/xiaomi/nabu/${{ env.KSU_CONFIG }}
           lunch lineage_nabu-bp4a-user
           mka bootimage -j${{ github.event.inputs.build_threads }}
+
       - name: Copy Non-Root Boot Images to Target Location
         run: |
-          cp out/target/product/lemonades/boot.img target/lemonades/non-root_boot.img
-          cp out/target/product/nabu/boot.img target/nabu/non-root_boot.img
+          cp out/target/product/lemonades/boot.img target/lemonades/non-root_boot.img || true
+          cp out/target/product/nabu/boot.img target/nabu/non-root_boot.img || true
 
   upload_non-root_boot:
     runs-on: self-hosted
@@ -230,12 +239,17 @@ jobs:
       START_BUILD_TIME: ${{ needs.init_context.outputs.build_start_time }}
       UPLOAD_PATH: "/OneDrive-Public"
     steps:
+      - name: Use Dev Upload Path
+        if: ${{ github.event.inputs.build_type == 'dev' }}
+        run: echo "UPLOAD_PATH=${{ env.UPLOAD_PATH}}/dev" >> $GITHUB_ENV
+
       - name: Setup Uploader
         run: |
           if [ ! -d uploader ]; then
             git clone https://github.com/neokoni/openlist_upload uploader
+            pip install -r uploader/requirements.txt --break-system-packages
           fi
-          pip install -r uploader/requirements.txt --break-system-packages
+
       - name: Upload Non-Root Boot Images for ${{ matrix.device }}
         run: |
           python3 uploader/openlist_upload.py "target/${{ matrix.device }}/non-root_boot.img" \
