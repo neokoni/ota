@@ -30,6 +30,11 @@ def parse_prop(prop_path):
                 props[key.strip()] = value.strip()
     return props
 
+def truncate_version_at_dot(version_str):
+    """Truncate version string at first dot (e.g. '16.2.0' -> '16')"""
+    match = re.match(r'^([^.]+)', version_str)
+    return match.group(1) if match else version_str
+
 def main():
     parser = argparse.ArgumentParser(description="Generate OTA JSON from zip and prop files.")
     parser.add_argument("files", nargs='+', help="Path to .zip and .prop files")
@@ -37,6 +42,8 @@ def main():
     parser.add_argument("--os", help="Override OS name (e.g. AviumUI)")
     parser.add_argument("--date", help="Override date (e.g. 2026-02-26)")
     parser.add_argument("--base-url", default=DEFAULT_BASE_URL, help="Override base URL")
+    parser.add_argument("-y", "--yes", action="store_true", help="Skip confirmation and save directly")
+    parser.add_argument("-n", "--no", action="store_true", help="Skip saving, only generate preview")
     
     args = parser.parse_args()
 
@@ -134,6 +141,8 @@ def main():
         rom_name = parts[0]
         try:
             rom_ver = parts[1] # Simple assumption based on example
+            # Truncate version at first dot (e.g. 16.2.0 -> 16)
+            rom_ver = truncate_version_at_dot(rom_ver)
         except IndexError:
              rom_ver = "unknown"
     else:
@@ -175,7 +184,7 @@ def main():
     # If args.version is provided, use it directly? 
     # The user example was --version=avium16
     if args.version:
-        url_ver_part = args.version
+        url_ver_part = truncate_version_at_dot(args.version)
         # Update path_ver_part logic if possible or assume standard
         # Original: path_ver_part = f"{rom_name_normalized}-{rom_ver}"
         # If version arg is avium16, we might not know rom_ver distinct from rom_name
@@ -185,6 +194,7 @@ def main():
 
     # Re-evaluate device codename if needed (not passed in args currently, maybe add?)
     # User didn't ask for device override, so keep from filename
+    # Apply version truncation to path_ver_part as well (will be set in next block)
     
     url = f"{args.base_url}/{device_codename}/{url_ver_part}/{date_formatted}/{zip_filename}"
     
@@ -211,13 +221,8 @@ def main():
     # Path version part: avium-16 (lowercase name + - + version)
     
     if args.version:
-         # Attempt to reconstruct "avium-16" from "avium16" or similar if possible
-         # Or just use the override if it looks right. 
-         # But the user example "avium16" lacks the hyphen.
-         # Let's try to be smart or just use what we have.
-         # If user gave --version=avium16, maybe we use that for directory too?
-         # Existing structure uses "avium-16".
-         path_ver_part = args.version
+         # Truncate version at first dot, then use for path
+         path_ver_part = truncate_version_at_dot(args.version)
     else:
         path_ver_part = f"{rom_name_normalized}-{rom_ver}" # avium-16
     
@@ -234,19 +239,29 @@ def main():
     print("="*30)
     print(f"Target File: {output_abs_path}")
     
-    try:
-        confirm = input("\nSave to file? (y/n): ").lower()
-    except KeyboardInterrupt:
-        print("\nOperation cancelled.")
-        sys.exit(0)
-
-    if confirm == 'y':
+    # Determine action based on flags or user input
+    if args.no:
+        print("\nPreview only (-n flag set). File not saved.")
+    elif args.yes:
+        confirm = 'y'
         os.makedirs(os.path.dirname(output_abs_path), exist_ok=True)
         with open(output_abs_path, 'w') as f:
             json.dump(ota_data, f, indent=2)
         print("File saved successfully.")
     else:
-        print("Operation cancelled.")
+        try:
+            confirm = input("\nSave to file? (y/n): ").lower()
+        except KeyboardInterrupt:
+            print("\nOperation cancelled.")
+            sys.exit(0)
+        
+        if confirm == 'y':
+            os.makedirs(os.path.dirname(output_abs_path), exist_ok=True)
+            with open(output_abs_path, 'w') as f:
+                json.dump(ota_data, f, indent=2)
+            print("File saved successfully.")
+        else:
+            print("Operation cancelled.")
 
 if __name__ == "__main__":
     main()

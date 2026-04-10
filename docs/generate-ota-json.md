@@ -5,7 +5,7 @@
 ## 前置要求
 
 - Python 3.x（无需额外依赖）
-- ROM ZIP 包（例如 `AviumUI-16.2.0-nabu-20260226-Unofficial-GMS.zip`）
+- ROM ZIP 包（例如 `abc-1.2.3-device-20260226-Unofficial-GMS.zip`）
 - 从 ROM ZIP 包中提取的 `build.prop` 文件（位于 `system/build.prop`）
 
 ## 基本用法
@@ -18,7 +18,7 @@ python3 scripts/generate_ota_json.py <zip文件> <build.prop文件> [选项]
 
 ```bash
 python3 scripts/generate_ota_json.py \
-  AviumUI-16.2.0-nabu-20260226-Unofficial-GMS.zip \
+  abc-1.2.3-device-20260226-Unofficial-GMS.zip \
   build.prop
 ```
 
@@ -33,11 +33,23 @@ python3 scripts/generate_ota_json.py \
 
 | 参数 | 说明 | 示例 |
 |------|------|------|
-| `files` | （必填）ZIP 文件和 build.prop 文件路径，顺序不限 | `rom.zip build.prop` |
+| `files` | （必填）ZIP 文件和 build.prop 文件路径，顺序不限 | `rom.zip build.prop` 或 `build.prop rom.zip` |
 | `--version` | 覆盖版本标识（用于 URL 和 JSON 中） | `--version=avium16` |
 | `--os` | 覆盖 ROM 名称 | `--os=AviumUI` |
 | `--date` | 覆盖日期（YYYY-MM-DD 或 YYYYMMDD 格式） | `--date=2026-02-26` |
 | `--base-url` | 覆盖下载基础 URL（默认：`https://pan.neokoni.ink/d/OneDrive-Public`） | `--base-url=https://example.com/dl` |
+| `-y, --yes` | 跳过确认对话，直接保存文件 | `generate_ota_json.py rom.zip build.prop -y` |
+| `-n, --no` | 仅生成预览，不保存文件 | `generate_ota_json.py rom.zip build.prop -n` |
+
+## 文件识别
+
+脚本会根据文件扩展名自动识别 ZIP 文件和 `build.prop` 文件，**两个文件的位置可以任意排列**（先后顺序无关）：
+
+```bash
+# 两种写法效果相同
+python3 scripts/generate_ota_json.py rom.zip build.prop
+python3 scripts/generate_ota_json.py build.prop rom.zip
+```
 
 ## 文件名解析规则
 
@@ -52,6 +64,14 @@ python3 scripts/generate_ota_json.py \
 - **日期前一位**：设备代号
 - **日期之后**：附加标签（忽略）
 
+### 版本号截断
+
+脚本会在版本号的**第一个点号处截断**（例如 `1.2.3` 截断为 `1`）。这适用于：
+- UUID 中的版本部分（如 `abc1` 而非 `abc1.2.3`）
+- 输出路径中的版本标识（如 `abc-1` 而非 `abc-1.2.3`）
+
+例如处理 `abc-1.2.3-device-20260226-Unofficial-GMS.zip` 时，版本 `1.2.3` 会被截断为 `1`。
+
 ## 输出路径
 
 生成的 `ota.json` 将保存至：
@@ -60,15 +80,17 @@ python3 scripts/generate_ota_json.py \
 public/{ROM名称}/{版本标识}/{设备代号}/ota.json
 ```
 
-例如，处理 `AviumUI-16.2.0-nabu-20260226-Unofficial-GMS.zip` 时，输出路径为：
+例如，处理 `abc-1.2.3-device-20260226-Unofficial-GMS.zip` 时，输出路径为：
 
 ```
-public/AviumUI/AviumUI-16.2.0-nabu/nabu/ota.json
+public/ABC/abc-1.2.3-device/nabu/ota.json
 ```
 
 > **提示**：如果输出路径与预期不符，可使用 `--version` 参数手动指定版本标识以控制路径。
 
-## 交互式确认
+## 保存文件
+
+### 默认行为（交互式）
 
 脚本在保存文件前会显示 JSON 预览并询问确认：
 
@@ -79,21 +101,37 @@ JSON Content Preview:
   "response": [
     {
       "datetime": 1772097425,
-      "filename": "AviumUI-16.2.0-nabu-20260226-Unofficial-GMS.zip",
+      "filename": "abc-1.2.3-device-20260226-Unofficial-GMS.zip",
       "id": "618bedfd390a3031da6bd063ac21d6d68b2e2faf",
       "size": 2590263421,
-      "url": "https://pan.neokoni.ink/d/OneDrive-Public/nabu/avium16/2026-02-26/...",
-      "version": "AviumUI-16.2.0-nabu"
+      "url": "https://pan.neokoni.ink/d/OneDrive-Public/device/abc1/2026-02-26/...",
+      "version": "abc-1.2.3-device"
     }
   ]
 }
 ==============================
-Target File: /path/to/public/AviumUI/AviumUI-16.2.0-nabu/nabu/ota.json
+Target File: /path/to/public/ABC/abc-1.2.3-device/device/ota.json
 
 Save to file? (y/n):
 ```
 
 输入 `y` 确认保存，输入其他任意内容或按 `Ctrl+C` 取消操作。
+
+### 自动保存
+
+使用 `-y` 或 `--yes` 参数跳过确认，直接保存文件：
+
+```bash
+python3 scripts/generate_ota_json.py rom.zip build.prop -y
+```
+
+### 仅预览
+
+使用 `-n` 或 `--no` 参数仅生成预览，不保存文件：
+
+```bash
+python3 scripts/generate_ota_json.py rom.zip build.prop -n
+```
 
 ## OTA JSON 格式详情
 
