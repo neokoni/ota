@@ -134,17 +134,17 @@ jobs:
     env:
       START_BUILD_TIME: ${{ needs.init_context.outputs.build_start_time }}
     steps:
-      # - name: Build Rom for lemonades
-      #   run: |
-      #     source build/envsetup.sh
-      #     lunch lineage_lemonades-bp4a-user
-      #     mka bacon -j${{ github.event.inputs.build_threads }}
+      - name: Build Rom for lemonades
+        run: |
+          source build/envsetup.sh
+          lunch lineage_lemonades-bp4a-user
+          mka bacon -j${{ github.event.inputs.build_threads }}
 
-      # - name: Build Rom for nabu
-      #   run: |
-      #     source build/envsetup.sh
-      #     lunch lineage_nabu-bp4a-user
-      #     mka bacon -j${{ github.event.inputs.build_threads }}
+      - name: Build Rom for nabu
+        run: |
+          source build/envsetup.sh
+          lunch lineage_nabu-bp4a-user
+          mka bacon -j${{ github.event.inputs.build_threads }}
 
       - name: Copy Rom to Target Location
         run: |
