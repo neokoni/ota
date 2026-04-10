@@ -83,17 +83,17 @@ jobs:
 
       - name: Checkout Device Trees
         run: |
-          git clone https://github.com/neokoni/android_device_xiaomi_nabu device/xiaomi/nabu
-          git clone https://github.com/neokoni/android_kernel_xiaomi_nabu kernel/xiaomi/nabu
-          git clone https://gitlab.com/dev-harsh1998/android_vendor_xiaomi_nabu  vendor/xiaomi/nabu --depth=1
-          git clone https://github.com/Lineageos/android_hardware_xiaomi hardware/xiaomi --depth=1
+          git clone https://github.com/neokoni/android_device_xiaomi_nabu device/xiaomi/nabu || true
+          git clone https://github.com/neokoni/android_kernel_xiaomi_nabu kernel/xiaomi/nabu || true
+          git clone https://gitlab.com/dev-harsh1998/android_vendor_xiaomi_nabu  vendor/xiaomi/nabu --depth=1 || true
+          git clone https://github.com/Lineageos/android_hardware_xiaomi hardware/xiaomi --depth=1 || true
 
-          git clone https://github.com/neokoni/android_device_oneplus_lemonades device/oneplus/lemonades
-          git clone https://github.com/neokoni/android_device_oneplus_sm8250-common device/oneplus/sm8250-common
-          git clone https://github.com/neokoni/android_kernel_oneplus_sm8250 kernel/oneplus/sm8250
-          git clone https://github.com/TheMuppets/proprietary_vendor_oneplus_lemonades  vendor/oneplus/lemonades --depth=1
-          git clone https://github.com/TheMuppets/proprietary_vendor_oneplus_sm8250-common vendor/oneplus/sm8250-common --depth=1
-          git clone https://github.com/LineageOS/android_hardware_oplus hardware/oplus --depth=1
+          git clone https://github.com/neokoni/android_device_oneplus_lemonades device/oneplus/lemonades || true
+          git clone https://github.com/neokoni/android_device_oneplus_sm8250-common device/oneplus/sm8250-common || true
+          git clone https://github.com/neokoni/android_kernel_oneplus_sm8250 kernel/oneplus/sm8250 || true
+          git clone https://github.com/TheMuppets/proprietary_vendor_oneplus_lemonades  vendor/oneplus/lemonades --depth=1 || true
+          git clone https://github.com/TheMuppets/proprietary_vendor_oneplus_sm8250-common vendor/oneplus/sm8250-common --depth=1 || true
+          git clone https://github.com/LineageOS/android_hardware_oplus hardware/oplus --depth=1 || true
 
       - name: Setup Kernel SU
         run: |
