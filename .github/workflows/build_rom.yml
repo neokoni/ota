@@ -153,9 +153,12 @@ jobs:
                 cp out/target/product/${device}/${img}.img target/${device}/${img}.img
               fi
             done
-            cp out/target/product/${device}/${${device}_img}.img target/${device}/
+            
             cp out/target/product/${device}/AviumUI*-${device}-${{needs.init_context.outputs.build_subfix}}.zip target/${device}/
           done
+
+          cp out/target/product/lemonades/${lemonades_img}.img target/lemonades/${lemonades_img}.img
+          cp out/target/product/nabu/${nabu_img}.img target/nabu/${nabu_img}.img
     
   upload_rom:
     runs-on: self-hosted
