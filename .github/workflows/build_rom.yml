@@ -106,6 +106,13 @@ jobs:
           git clone https://github.com/TheMuppets/proprietary_vendor_oneplus_sm8250-common vendor/oneplus/sm8250-common --depth=1 || true
           git clone https://github.com/LineageOS/android_hardware_oplus hardware/oplus --depth=1 || true
 
+      - name: Setup Uploader
+        run: |
+          if [ ! -d uploader ]; then
+            git clone https://github.com/neokoni/openlist_upload uploader
+            pip install -r uploader/requirements.txt --break-system-packages
+          fi
+
       - name: Setup Kernel SU
         run: |
           cd kernel/xiaomi/nabu
@@ -179,13 +186,6 @@ jobs:
         if: ${{ github.event.inputs.build_type == 'dev' }}
         run: echo "UPLOAD_PATH=${{ env.UPLOAD_PATH}}/dev" >> $GITHUB_ENV
 
-      - name: Setup Uploader
-        run: |
-          if [ ! -d uploader ]; then
-            git clone https://github.com/neokoni/openlist_upload uploader
-            pip install -r uploader/requirements.txt --break-system-packages
-          fi
-
       - name: Upload Artifacts to OpenList
         run: |
           python3 uploader/openlist_upload.py "target/${{ matrix.device }}/*" \
@@ -245,13 +245,6 @@ jobs:
       - name: Use Dev Upload Path
         if: ${{ github.event.inputs.build_type == 'dev' }}
         run: echo "UPLOAD_PATH=${{ env.UPLOAD_PATH}}/dev" >> $GITHUB_ENV
-
-      - name: Setup Uploader
-        run: |
-          if [ ! -d uploader ]; then
-            git clone https://github.com/neokoni/openlist_upload uploader
-            pip install -r uploader/requirements.txt --break-system-packages
-          fi
 
       - name: Upload Non-Root Boot Images for ${{ matrix.device }}
         run: |
