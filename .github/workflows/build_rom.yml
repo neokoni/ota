@@ -67,6 +67,8 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global --add safe.directory "*"
+          git config --global credential.helper store
+          echo "https://neokoni:${{ secrets.GH_PAT }}@github.com" >> ~/.git-credentials
 
       - name: Setup Source
         run: |
@@ -79,10 +81,7 @@ jobs:
           avium get_gms --cli --update-local-manifests --run-sync
 
       - name: Checkout Signing Keys
-        uses: actions/checkout@v6.0.2
-        with:
-          repository: "neokoni/android_vendor_lineage-priv_keys"
-          path: "vendor/lineage-priv/keys"
+        run: git clone https://github.com/neokoni/android_vendor_lineage-priv_keys vendor/lineage/priv-keys --depth=1 || true
 
       - name: Checkout Device Trees
         run: |
