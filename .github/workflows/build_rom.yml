@@ -38,6 +38,10 @@ env:
   USER: "neokoni"
   USE_CCACHE: 1
   CCACHE_DIR: "/aosp_build/ccache"
+  BUILD_HOST: NeoBuild
+  BUILD_HOSTNAME: NeoBuild
+  BUILD_USER: Neokoni
+  BUILD_USERNAME: Neokoni
 
 
 jobs:
@@ -122,10 +126,6 @@ jobs:
         working-directory: ${{ needs.init_context.outputs.shared_workdir }}
     env:
       START_BUILD_TIME: ${{ needs.init_context.outputs.build_start_time }}
-      BUILD_HOST: NeoBuild
-      BUILD_HOSTNAME: NeoBuild
-      BUILD_USER: Neokoni
-      BUILD_USERNAME: Neokoni
     steps:
       # - name: Build Rom for lemonades
       #   run: |
