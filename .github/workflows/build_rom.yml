@@ -82,12 +82,12 @@ jobs:
       - name: Setup Source
         run: |
           repo init -u ${{ env.ANDROID_MANIFEST}} -b ${{ env.ANDROID_BRANCH}} ${{ env.REPO_INIT_ARGS}}
-          repo sync ${{ env.REPO_SYNC_ARGS}}
+          # repo sync ${{ env.REPO_SYNC_ARGS}}
 
       - name: Fetch GMS vendor
         run: |
           source build/envsetup.sh
-          avium get_gms --cli --update-local-manifests --run-sync
+          # avium get_gms --cli --update-local-manifests --run-sync
 
       - name: Checkout Signing Keys
         run: git clone https://github.com/neokoni/android_vendor_lineage-priv_keys vendor/lineage/priv-keys --depth=1 || true
@@ -109,13 +109,13 @@ jobs:
       - name: Setup Kernel SU
         run: |
           cd kernel/xiaomi/nabu
-          rm -rf KernelSU drivers/kernelsu
-          curl -LSs "https://raw.githubusercontent.com/rsuntk/KernelSU/main/kernel/setup.sh" | bash -s main
+          # rm -rf KernelSU drivers/kernelsu
+          # curl -LSs "https://raw.githubusercontent.com/rsuntk/KernelSU/main/kernel/setup.sh" | bash -s main
           
-          cd ${{ needs.init_context.outputs.shared_workdir }}
-          cd kernel/oneplus/sm8250
-          rm -rf KernelSU drivers/kernelsu
-          curl -LSs "https://raw.githubusercontent.com/rsuntk/KernelSU/main/kernel/setup.sh" | bash -s main
+          # cd ${{ needs.init_context.outputs.shared_workdir }}
+          # cd kernel/oneplus/sm8250
+          # rm -rf KernelSU drivers/kernelsu
+          # curl -LSs "https://raw.githubusercontent.com/rsuntk/KernelSU/main/kernel/setup.sh" | bash -s main
     
 
   build_rom:
@@ -141,24 +141,25 @@ jobs:
 
       - name: Copy Rom to Target Location
         run: |
-          nabu_img=vendor_boot
-          lemonades_img=recovery
-          all_devices=("lemonades" "nabu")
-          upload_img=("boot" "dtbo" "super_empty")
+          echo "Skipped"
+          # nabu_img=vendor_boot
+          # lemonades_img=recovery
+          # all_devices=("lemonades" "nabu")
+          # upload_img=("boot" "dtbo" "super_empty")
 
-          for device in ${all_devices[@]}; do
-            mkdir -p target/${device}
-            for img in ${upload_img[@]}; do
-              if [ -f out/target/product/${device}/${img}.img ]; then
-                cp out/target/product/${device}/${img}.img target/${device}/${img}.img
-              fi
-            done
+          # for device in ${all_devices[@]}; do
+          #   mkdir -p target/${device}
+          #   for img in ${upload_img[@]}; do
+          #     if [ -f out/target/product/${device}/${img}.img ]; then
+          #       cp out/target/product/${device}/${img}.img target/${device}/${img}.img
+          #     fi
+          #   done
             
-            cp out/target/product/${device}/AviumUI*-${device}-${{needs.init_context.outputs.build_subfix}}.zip target/${device}/
-          done
+          #   cp out/target/product/${device}/AviumUI*-${device}-${{needs.init_context.outputs.build_subfix}}.zip target/${device}/
+          # done
 
-          cp out/target/product/lemonades/${lemonades_img}.img target/lemonades/${lemonades_img}.img
-          cp out/target/product/nabu/${nabu_img}.img target/nabu/${nabu_img}.img
+          # cp out/target/product/lemonades/${lemonades_img}.img target/lemonades/${lemonades_img}.img
+          # cp out/target/product/nabu/${nabu_img}.img target/nabu/${nabu_img}.img
     
   upload_rom:
     runs-on: self-hosted
@@ -206,24 +207,26 @@ jobs:
       START_BUILD_TIME: ${{ needs.init_context.outputs.build_start_time }}
       UPLOAD_PATH: "/OneDrive-Public"
     steps:
-      - name: Build Non-Root Boot Images (lemonades)
-        run: |
-          source build/envsetup.sh
-          lunch lineage_lemonades-bp4a-user
-          sed -i 's/y/n/g' kernel/oneplus/sm8250/${{ env.KSU_CONFIG }}
-          mka bootimage -j${{ github.event.inputs.build_threads }}
+      # - name: Build Non-Root Boot Images (lemonades)
+      #   run: |
+      #     source build/envsetup.sh
+      #     lunch lineage_lemonades-bp4a-user
+      #     sed -i 's/y/n/g' kernel/oneplus/sm8250/${{ env.KSU_CONFIG }}
+      #     mka bootimage -j${{ github.event.inputs.build_threads }}
 
-      - name: Build Non-Root Boot Images (nabu)
-        run: |
-          source build/envsetup.sh
-          sed -i 's/y/n/g' kernel/xiaomi/nabu/${{ env.KSU_CONFIG }}
-          lunch lineage_nabu-bp4a-user
-          mka bootimage -j${{ github.event.inputs.build_threads }}
+      # - name: Build Non-Root Boot Images (nabu)
+      #   run: |
+      #     source build/envsetup.sh
+      #     sed -i 's/y/n/g' kernel/xiaomi/nabu/${{ env.KSU_CONFIG }}
+      #     lunch lineage_nabu-bp4a-user
+      #     mka bootimage -j${{ github.event.inputs.build_threads }}
 
-      - name: Copy Non-Root Boot Images to Target Location
-        run: |
-          cp out/target/product/lemonades/boot.img target/lemonades/non-root_boot.img || true
-          cp out/target/product/nabu/boot.img target/nabu/non-root_boot.img || true
+      # - name: Copy Non-Root Boot Images to Target Location
+      #   run: |
+      #     cp out/target/product/lemonades/boot.img target/lemonades/non-root_boot.img || true
+      #     cp out/target/product/nabu/boot.img target/nabu/non-root_boot.img || true
+      - name: Skipped
+        run: echo "Skipped"
 
   upload_non-root_boot:
     runs-on: self-hosted
