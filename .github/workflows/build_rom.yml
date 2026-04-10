@@ -125,13 +125,13 @@ jobs:
       - name: Build Rom for lemonades
         run: |
           source build/envsetup.sh
-          lunch lineage_lemonades-user
+          lunch lineage_lemonades-bp4a-user
           mka bacon -j${{ github.event.inputs.build_threads }}
 
       - name: Build Rom for nabu
         run: |
           source build/envsetup.sh
-          lunch lineage_nabu-user
+          lunch lineage_nabu-bp4a-user
           mka bacon -j${{ github.event.inputs.build_threads }}
 
       - name: Copy Rom to Target Location
@@ -198,14 +198,14 @@ jobs:
       - name: Build Non-Root Boot Images (lemonades)
         run: |
           source build/envsetup.sh
-          lunch lineage_lemonades-user
+          lunch lineage_lemonades-bp4a-user
           sed -i 's/y/n/g' kernel/oneplus/sm8250/${{ env.KSU_CONFIG }}
           mka bootimage -j${{ github.event.inputs.build_threads }}
       - name: Build Non-Root Boot Images (nabu)
         run: |
           source build/envsetup.sh
           sed -i 's/y/n/g' kernel/xiaomi/nabu/${{ env.KSU_CONFIG }}
-          lunch lineage_nabu-user
+          lunch lineage_nabu-bp4a-user
           mka bootimage -j${{ github.event.inputs.build_threads }}
       - name: Copy Non-Root Boot Images to Target Location
         run: |
