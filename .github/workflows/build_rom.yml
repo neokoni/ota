@@ -37,7 +37,7 @@ env:
 
 jobs:
   init_context:
-    runs-on: neobuild
+    runs-on: self-hosted
     outputs:
       build_start_time: ${{ steps.context.outputs.build_start_time }}
       shared_workdir: ${{ steps.context.outputs.shared_workdir }}
@@ -58,7 +58,7 @@ jobs:
     defaults:
       run:
         working-directory: ${{ needs.init_context.outputs.shared_workdir }}
-    runs-on: neobuild
+    runs-on: self-hosted
     steps:
       - name: Setup Git Info
         run: |
@@ -108,7 +108,7 @@ jobs:
     
 
   build_rom:
-    runs-on: neobuild
+    runs-on: self-hosted
     needs: [init_context, ready_devices]
     defaults:
       run:
@@ -155,7 +155,7 @@ jobs:
           cp "out/target/product/nabu/${nabu_img}.img" "target/nabu/${nabu_img}.img"
     
   upload_rom:
-    runs-on: neobuild
+    runs-on: self-hosted
     needs: [init_context, build_rom]
     if: ${{ github.event.inputs.upload == 'true' }}
     defaults:
@@ -185,7 +185,7 @@ jobs:
             --mkdir
 
   build_non-root_boot:
-    runs-on: neobuild
+    runs-on: self-hosted
     needs: [init_context, build_rom]
     defaults:
       run:
@@ -211,7 +211,7 @@ jobs:
           cp "out/target/product/nabu/boot.img" "target/nabu/non-root_boot.img"
     
   upload_non-root_boot:
-    runs-on: neobuild
+    runs-on: self-hosted
     needs: [init_context, build_non-root_boot, upload_rom]
     if: ${{ github.event.inputs.upload == 'true' }}
     defaults:
