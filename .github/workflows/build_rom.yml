@@ -1,0 +1,243 @@
+name: Build Rom
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_type:
+        type: choice
+        description: 'Type of build to perform'
+        required: true
+        default: 'dev'
+        options:
+          - dev
+          - release
+      upload:
+        type: boolean
+        description: 'Upload the build to the server'
+        required: true
+        default: true
+      build_threads:
+        type: number
+        description: 'Number of threads to use for building'
+        required: true
+        default: 16
+      sync_threads:
+        type: number
+        description: 'Number of threads to use for syncing the source'
+        required: true
+        default: 6
+
+defaults:
+  run:
+    working-directory: ${{ github.workspace }}
+    shell: bash
+
+env:
+  TZ: "Asia/Shanghai"
+
+jobs:
+  init_context:
+    runs-on: neobuild
+    outputs:
+      build_start_time: ${{ steps.context.outputs.build_start_time }}
+      shared_workdir: ${{ steps.context.outputs.shared_workdir }}
+    steps:
+      - name: Init Global Context
+        id: context
+        run: |
+          echo "build_start_time=$(date +%Y-%m-%d-%H%M)" >> $GITHUB_OUTPUT
+          echo "shared_workdir=/aosp_build" >> $GITHUB_OUTPUT
+
+  ready_devices:
+    needs: init_context
+    env:
+      ANDROID_MANIFEST: "https://github.com/AviumUI/android_manifests"
+      ANDROID_BRANCH: "avium-16.2"
+      REPO_INIT_ARGS: "--depth=1 --git-lfs"
+      REPO_SYNC_ARGS: "-j${{ github.event.inputs.sync_threads }} --force-sync --no-clone-bundle --no-tags"
+    defaults:
+      run:
+        working-directory: ${{ needs.init_context.outputs.shared_workdir }}
+    runs-on: neobuild
+    steps:
+      - name: Setup Git Info
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Setup Source
+        run: |
+          repo init -u ${{ env.ANDROID_MANIFEST}} -b ${{ env.ANDROID_BRANCH}} ${{ env.REPO_INIT_ARGS}}
+          repo sync ${{ env.REPO_SYNC_ARGS}}
+
+      - name: Fetch GMS vendor
+        run: |
+          source build/envsetup.sh
+          avium get_gms --cli --update-local-manifests --run-sync
+
+      - name: Checkout Signing Keys
+        uses: actions/checkout@v6.0.2
+        with:
+          repository: "neokoni/android_vendor_lineage-priv_keys"
+          path: "vendor/lineage-priv/keys"
+
+      - name: Checkout Device Trees
+        run: |
+          git clone https://github.com/neokoni/android_device_xiaomi_nabu device/xiaomi/nabu
+          git clone https://github.com/neokoni/android_kernel_xiaomi_nabu kernel/xiaomi/nabu
+          git clone https://gitlab.com/dev-harsh1998/android_vendor_xiaomi_nabu  vendor/xiaomi/nabu --depth=1
+          git clone https://github.com/Lineageos/android_hardware_xiaomi hardware/xiaomi --depth=1
+
+          git clone https://github.com/neokoni/android_device_oneplus_lemonades device/oneplus/lemonades
+          git clone https://github.com/neokoni/android_device_oneplus_sm8250-common device/oneplus/sm8250-common
+          git clone https://github.com/neokoni/android_kernel_oneplus_sm8250 kernel/oneplus/sm8250
+          git clone https://github.com/TheMuppets/proprietary_vendor_oneplus_lemonades  vendor/oneplus/lemonades --depth=1
+          git clone https://github.com/TheMuppets/proprietary_vendor_oneplus_sm8250-common vendor/oneplus/sm8250-common --depth=1
+          git clone https://github.com/LineageOS/android_hardware_oplus hardware/oplus --depth=1
+
+      - name: Setup Kernel SU
+        run: |
+          cd kernel/xiaomi/nabu
+          rm -rf KernelSU drivers/kernelsu
+          curl -LSs "https://raw.githubusercontent.com/rsuntk/KernelSU/main/kernel/setup.sh" | bash -s main
+          
+          cd ${{ needs.init_context.outputs.shared_workdir }}
+          cd kernel/oneplus/sm8250
+          rm -rf KernelSU drivers/kernelsu
+          curl -LSs "https://raw.githubusercontent.com/rsuntk/KernelSU/main/kernel/setup.sh" | bash -s main
+    
+
+  build_rom:
+    runs-on: neobuild
+    needs: [init_context, ready_devices]
+    defaults:
+      run:
+        working-directory: ${{ needs.init_context.outputs.shared_workdir }}
+    env:
+      START_BUILD_TIME: ${{ needs.init_context.outputs.build_start_time }}
+      BUILD_HOST: NeoBuild
+      BUILD_HOSTNAME: NeoBuild
+      BUILD_USER: Neokoni
+      BUILD_USERNAME: Neokoni
+    steps:
+      - name: Build Rom for lemonades
+        run: |
+          source build/envsetup.sh
+          lunch avium_lemonades-user
+          mka bacon -j${{ github.event.inputs.build_threads }}
+
+      - name: Build Rom for nabu
+        run: |
+          source build/envsetup.sh
+          lunch avium_nabu-user
+          mka bacon -j${{ github.event.inputs.build_threads }}
+
+      - name: Copy Rom to Target Location
+        run: |
+          nabu_img=vendor_boot
+          lemonades_img=recovery
+          all_devices=("lemonades" "nabu")
+          upload_img=("boot" "dtbo" "super_empty")
+
+          for device in "${all_devices[@]}"; do
+            mkdir -p target/${device}
+            for img in "${upload_img[@]}"; do
+              if [ -f "out/target/product/${device}/${img}.img" ]; then
+                cp "out/target/product/${device}/${img}.img" "target/${device}/${img}.img"
+              fi
+            done
+          done
+
+          cp "out/target/product/lemonades/${lemonades_img}.img" "target/lemonades/${lemonades_img}.img"
+          cp "out/target/product/nabu/${nabu_img}.img" "target/nabu/${nabu_img}.img"
+    
+  upload_rom:
+    runs-on: neobuild
+    needs: [init_context, build_rom]
+    if: ${{ github.event.inputs.upload == 'true' }}
+    defaults:
+      run:
+        working-directory: ${{ needs.init_context.outputs.shared_workdir }}
+    strategy:
+      matrix:
+        device: [lemonades, nabu]
+    env:
+      START_BUILD_TIME: ${{ needs.init_context.outputs.build_start_time }}
+      UPLOAD_PATH: "/OneDrive-Public"
+    steps:
+      - name: Use Dev Upload Path
+        if: ${{ github.event.inputs.build_type == 'dev' }}
+        run: echo "UPLOAD_PATH=${{ env.UPLOAD_PATH}}/dev" >> $GITHUB_ENV
+        
+      - name: Upload Artifacts to OpenList
+        run: |
+          git clone https://github.com/neokoni/openlist_upload uploader
+          pip install -r uploader/requirements.txt --break-system-packages
+          python3 uploader/openlist_upload.py "target/${{ matrix.device }}/*" \
+            --base-url ${{ secrets.OPENLIST_HOST }} \
+            --remote-dir "${{ env.UPLOAD_PATH }}/${{ matrix.device }}/avium16/${{ env.START_BUILD_TIME }}/" \
+            --username ${{ secrets.OPENLIST_USERNAME }} \
+            --password ${{ secrets.OPENLIST_PASSWORD }} \
+            --overwrite \
+            --mkdir
+
+  build_non-root_boot:
+    runs-on: neobuild
+    needs: [init_context, build_rom]
+    defaults:
+      run:
+        working-directory: ${{ needs.init_context.outputs.shared_workdir }}
+    env:
+      KSU_CONFIG: "arch/arm64/configs/vendor/ksu.config"
+    steps:
+      - name: Build Non-Root Boot Images (lemonades)
+        run: |
+          source build/envsetup.sh
+          lunch avium_lemonades-user
+          sed -i 's/y/n/g' kernel/oneplus/sm8250/${{ env.KSU_CONFIG }}
+          mka bootimage -j${{ github.event.inputs.build_threads }}
+      - name: Build Non-Root Boot Images (nabu)
+        run: |
+          source build/envsetup.sh
+          sed -i 's/y/n/g' kernel/xiaomi/nabu/${{ env.KSU_CONFIG }}
+          lunch avium_nabu-user
+          mka bootimage -j${{ github.event.inputs.build_threads }}
+      - name: Copy Non-Root Boot Images to Target Location
+        run: |
+          cp "out/target/product/lemonades/boot.img" "target/lemonades/non-root_boot.img"
+          cp "out/target/product/nabu/boot.img" "target/nabu/non-root_boot.img"
+    
+  upload_non-root_boot:
+    runs-on: neobuild
+    needs: [init_context, build_non-root_boot, upload_rom]
+    if: ${{ github.event.inputs.upload == 'true' }}
+    defaults:
+      run:
+        working-directory: ${{ needs.init_context.outputs.shared_workdir }}
+    strategy:
+      matrix:
+        device: [lemonades, nabu]
+    env:
+      START_BUILD_TIME: ${{ needs.init_context.outputs.build_start_time }}
+      UPLOAD_PATH: "/OneDrive-Public"
+    steps:
+      - name: Setup Uploader
+        run: |
+          if [ ! -d uploader ]; then
+            git clone https://github.com/neokoni/openlist_upload uploader
+          fi
+          pip install -r uploader/requirements.txt --break-system-packages
+      - name: Upload Non-Root Boot Images for ${{ matrix.device }}
+        run: |
+          python3 uploader/openlist_upload.py "target/${{ matrix.device }}/non-root_boot.img" \
+            --base-url ${{ secrets.OPENLIST_HOST }} \
+            --remote-dir "${{ env.UPLOAD_PATH }}/${{ matrix.device }}/avium16/${{ env.START_BUILD_TIME }}/" \
+            --username ${{ secrets.OPENLIST_USERNAME }} \
+            --password ${{ secrets.OPENLIST_PASSWORD }} \
+            --overwrite \
+            --mkdir
+
+
+  
+        
+        
