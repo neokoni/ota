@@ -113,7 +113,7 @@ jobs:
 
             # Configure the runner
             su ${{ github.event.inputs.runner_user }} -c "bash config.sh --url https://github.com/neokoni/ota --token ${{ github.event.inputs.runner_token }} --name neobuild --work ${{ env.RUNNER_WORKDIR }} --replace --unattended"
-            bash svc.sh install
+            bash svc.sh install ${{ github.event.inputs.runner_user }}
             bash svc.sh start
 
   
