@@ -148,6 +148,9 @@ jobs:
             done
           done
 
+          cp "out/target/product/lemonades/AviumUI*.zip" "target/lemonades/"
+          cp "out/target/product/nabu/AviumUI*.zip" "target/nabu/"
+
           cp "out/target/product/lemonades/${lemonades_img}.img" "target/lemonades/${lemonades_img}.img"
           cp "out/target/product/nabu/${nabu_img}.img" "target/nabu/${nabu_img}.img"
     
