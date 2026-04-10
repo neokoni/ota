@@ -46,12 +46,14 @@ jobs:
     outputs:
       build_start_time: ${{ steps.context.outputs.build_start_time }}
       shared_workdir: ${{ steps.context.outputs.shared_workdir }}
+      build_subfix: ${{ steps.context.outputs.build_subfix }}
     steps:
       - name: Init Global Context
         id: context
         run: |
           echo "build_start_time=$(date +%Y-%m-%d-%H%M)" >> $GITHUB_OUTPUT
           echo "shared_workdir=/aosp_build" >> $GITHUB_OUTPUT
+          echo "build_subfix=$(date +%Y%m%d)-Unofficial-GMS" >> $GITHUB_OUTPUT
 
   ready_devices:
     needs: init_context
@@ -151,13 +153,9 @@ jobs:
                 cp out/target/product/${device}/${img}.img target/${device}/${img}.img
               fi
             done
+            cp out/target/product/${device}/${${device}_img}.img target/${device}/
+            cp out/target/product/${device}/AviumUI*-${device}-${{needs.init_context.outputs.build_subfix}}.zip target/${device}/
           done
-
-          cp out/target/product/lemonades/AviumUI*.zip target/lemonades/
-          cp out/target/product/nabu/AviumUI*.zip target/nabu/
-
-          cp out/target/product/lemonades/${lemonades_img}.img target/lemonades/${lemonades_img}.img
-          cp out/target/product/nabu/${nabu_img}.img target/nabu/${nabu_img}.img
     
   upload_rom:
     runs-on: self-hosted
