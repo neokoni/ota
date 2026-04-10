@@ -144,20 +144,20 @@ jobs:
           all_devices=("lemonades" "nabu")
           upload_img=("boot" "dtbo" "super_empty")
 
-          for device in "${all_devices[@]}"; do
+          for device in ${all_devices[@]}; do
             mkdir -p target/${device}
-            for img in "${upload_img[@]}"; do
-              if [ -f "out/target/product/${device}/${img}.img" ]; then
-                cp "out/target/product/${device}/${img}.img" "target/${device}/${img}.img"
+            for img in ${upload_img[@]}; do
+              if [ -f out/target/product/${device}/${img}.img ]; then
+                cp out/target/product/${device}/${img}.img target/${device}/${img}.img
               fi
             done
           done
 
-          cp "out/target/product/lemonades/AviumUI*.zip" "target/lemonades/"
-          cp "out/target/product/nabu/AviumUI*.zip" "target/nabu/"
+          cp out/target/product/lemonades/AviumUI*.zip target/lemonades/
+          cp out/target/product/nabu/AviumUI*.zip target/nabu/
 
-          cp "out/target/product/lemonades/${lemonades_img}.img" "target/lemonades/${lemonades_img}.img"
-          cp "out/target/product/nabu/${nabu_img}.img" "target/nabu/${nabu_img}.img"
+          cp out/target/product/lemonades/${lemonades_img}.img target/lemonades/${lemonades_img}.img
+          cp out/target/product/nabu/${nabu_img}.img target/nabu/${nabu_img}.img
     
   upload_rom:
     runs-on: self-hosted
@@ -212,9 +212,9 @@ jobs:
           mka bootimage -j${{ github.event.inputs.build_threads }}
       - name: Copy Non-Root Boot Images to Target Location
         run: |
-          cp "out/target/product/lemonades/boot.img" "target/lemonades/non-root_boot.img"
-          cp "out/target/product/nabu/boot.img" "target/nabu/non-root_boot.img"
-    
+          cp out/target/product/lemonades/boot.img target/lemonades/non-root_boot.img
+          cp out/target/product/nabu/boot.img target/nabu/non-root_boot.img
+
   upload_non-root_boot:
     runs-on: self-hosted
     needs: [init_context, build_non-root_boot, upload_rom]
