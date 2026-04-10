@@ -16,6 +16,11 @@ on:
         type: string
         description: 'SSH root password'
         required: true
+      install_dependencies:
+        type: boolean
+        description: 'Should install AOSP build dependencies'
+        required: true
+        default: true
       runner_token:
         type: string
         description: 'GitHub Runner Token'
@@ -62,6 +67,7 @@ jobs:
           echo "RUNNER_WORKDIR=${{ github.event.inputs.runner_workdir }}" >> $GITHUB_ENV
 
       - name: Install AOSP Build Dependencies
+        if: ${{ github.event.inputs.install_dependencies == 'true' }}
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ github.event.inputs.host }}
