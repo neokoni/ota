@@ -218,7 +218,7 @@ jobs:
 
   upload_non-root_boot:
     runs-on: self-hosted
-    needs: [init_context, build_non-root_boot, upload_rom]
+    needs: [init_context, build_non-root_boot]
     if: ${{ github.event.inputs.upload == 'true' }}
     defaults:
       run:
