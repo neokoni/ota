@@ -36,6 +36,9 @@ env:
   TZ: "Asia/Shanghai"
   HOME: "/home/neokoni"
   USER: "neokoni"
+  USE_CCACHE: 1
+  CCACHE_DIR: "/aosp_build/ccache"
+
 
 jobs:
   init_context:
