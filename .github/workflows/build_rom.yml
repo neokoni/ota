@@ -113,6 +113,13 @@ jobs:
             pip install -r uploader/requirements.txt --break-system-packages
           fi
 
+      - name: Setup ota release
+        if: ${{ github.event.inputs.build_type == 'release' }}
+        run: |
+          rm -rf ota || true
+          git clone https://github.com/neokoni/ota
+          cd ota && git checkout pre-release
+
       - name: Setup Kernel SU
         run: |
           cd kernel/xiaomi/nabu
@@ -252,7 +259,30 @@ jobs:
             --overwrite \
             --mkdir
 
+  release_rom:
+    runs-on: self-hosted
+    needs: [init_context, upload_rom]
+    if: ${{ github.event.inputs.build_type == 'release' }}
+    defaults:
+      run:
+        working-directory: ${{ needs.init_context.outputs.shared_workdir }}
 
-  
-        
-        
+    steps:
+      - name: Generate ota.json
+        run: |
+          cd ota
+          device_list=("lemonades" "nabu")
+          for device in ${device_list[@]}; do
+            python3 scripts/generate_ota_json.py \
+              target/${{ matrix.device }}/$(ls target/${{ matrix.device }}/ | grep ${{ needs.init_context.outputs.build_subfix }}) \
+              out/target/product/${{ matrix.device }}/system/build.prop -y
+          done
+
+      - name: Release it
+        run: |
+          cd ota
+          git add .
+          git commit -m "ota: publish new ota"
+          git checkout main
+          git merge pre-release --no-edit
+          git push origin main
