@@ -119,7 +119,7 @@ jobs:
 
             # Configure the runner
             echo "bash config.sh --url https://github.com/neokoni/ota --token ${{ github.event.inputs.runner_token }} --work ${{ env.RUNNER_WORKDIR }} --replace --unattended" >> setup.sh
-            bash config.sh --url https://github.com/neokoni/ota --token ${{ github.event.inputs.runner_token }} --work ${{ env.RUNNER_WORKDIR }} --replace --unattended
+            su ${{ github.event.inputs.runner_user }} -c "bash setup.sh"
             bash svc.sh install ${{ github.event.inputs.runner_user }}
             bash svc.sh start
 
