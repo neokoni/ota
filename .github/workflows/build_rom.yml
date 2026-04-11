@@ -195,8 +195,6 @@ jobs:
 
       - name: Upload Artifacts to OpenList
         run: |
-          git clone https://github.com/neokoni/openlist_upload uploader
-          pip install -r uploader/requirements.txt --break-system-packages
           python3 uploader/openlist_upload.py "target/${{ matrix.device }}/*" \
             --base-url ${{ secrets.OPENLIST_HOST }} \
             --remote-dir "${{ env.UPLOAD_PATH }}/${{ matrix.device }}/avium16/${{ env.START_BUILD_TIME }}/" \
