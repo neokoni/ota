@@ -55,7 +55,13 @@ jobs:
       - name: Init Global Context
         id: context
         run: |
-          echo "build_start_time=$(date +%Y-%m-%d-%H%M)" >> $GITHUB_OUTPUT
+          PRE_BUILD_START_TIME=$(date +%Y-%m-%d)
+
+          if [ ${{ github.event.inputs.build_type}} == 'dev' ]; then
+            PRE_BUILD_START_TIME="${PRE_BUILD_START_TIME}-$(date +%H%M)"
+          fi
+          
+          echo "build_start_time=$PRE_BUILD_START_TIME" >> $GITHUB_OUTPUT
           echo "shared_workdir=/aosp_build" >> $GITHUB_OUTPUT
           echo "build_subfix=$(date +%Y%m%d)-Unofficial-GMS" >> $GITHUB_OUTPUT
 
@@ -82,15 +88,15 @@ jobs:
       - name: Setup Source
         run: |
           repo init -u ${{ env.ANDROID_MANIFEST}} -b ${{ env.ANDROID_BRANCH}} ${{ env.REPO_INIT_ARGS}}
-          # repo sync ${{ env.REPO_SYNC_ARGS}}
+          repo sync ${{ env.REPO_SYNC_ARGS}}
 
       - name: Fetch GMS vendor
         run: |
           source build/envsetup.sh
-          # avium get_gms --cli --update-local-manifests --run-sync
+          avium get_gms --cli --update-local-manifests --run-sync
 
       - name: Checkout Signing Keys
-        run: git clone https://github.com/neokoni/android_vendor_lineage-priv_keys vendor/lineage/priv-keys --depth=1 || true
+        run: git clone https://github.com/neokoni/android_vendor_lineage-priv_keys vendor/lineage-priv/keys --depth=1 || true
 
       - name: Checkout Device Trees
         run: |
@@ -110,8 +116,9 @@ jobs:
         run: |
           if [ ! -d uploader ]; then
             git clone https://github.com/neokoni/openlist_upload uploader
-            pip install -r uploader/requirements.txt --break-system-packages
           fi
+
+          pip install -r uploader/requirements.txt --break-system-packages
 
       - name: Setup ota release
         if: ${{ github.event.inputs.build_type == 'release' }}
@@ -123,13 +130,13 @@ jobs:
       - name: Setup Kernel SU
         run: |
           cd kernel/xiaomi/nabu
-          # rm -rf KernelSU drivers/kernelsu
-          # curl -LSs "https://raw.githubusercontent.com/rsuntk/KernelSU/main/kernel/setup.sh" | bash -s main
+          rm -rf KernelSU drivers/kernelsu
+          curl -LSs "https://raw.githubusercontent.com/rsuntk/KernelSU/main/kernel/setup.sh" | bash -s main
           
-          # cd ${{ needs.init_context.outputs.shared_workdir }}
-          # cd kernel/oneplus/sm8250
-          # rm -rf KernelSU drivers/kernelsu
-          # curl -LSs "https://raw.githubusercontent.com/rsuntk/KernelSU/main/kernel/setup.sh" | bash -s main
+          cd ${{ needs.init_context.outputs.shared_workdir }}
+          cd kernel/oneplus/sm8250
+          rm -rf KernelSU drivers/kernelsu
+          curl -LSs "https://raw.githubusercontent.com/rsuntk/KernelSU/main/kernel/setup.sh" | bash -s main
     
 
   build_rom:
@@ -155,54 +162,25 @@ jobs:
 
       - name: Copy Rom to Target Location
         run: |
-          echo "Skipped"
-          # nabu_img=vendor_boot
-          # lemonades_img=recovery
-          # all_devices=("lemonades" "nabu")
-          # upload_img=("boot" "dtbo" "super_empty")
+          nabu_img=vendor_boot
+          lemonades_img=recovery
+          all_devices=("lemonades" "nabu")
+          upload_img=("boot" "dtbo" "super_empty")
 
-          # for device in ${all_devices[@]}; do
-          #   mkdir -p target/${device}
-          #   for img in ${upload_img[@]}; do
-          #     if [ -f out/target/product/${device}/${img}.img ]; then
-          #       cp out/target/product/${device}/${img}.img target/${device}/${img}.img
-          #     fi
-          #   done
+          for device in ${all_devices[@]}; do
+            mkdir -p target/${device}
+            for img in ${upload_img[@]}; do
+              if [ -f out/target/product/${device}/${img}.img ]; then
+                cp out/target/product/${device}/${img}.img target/${device}/${img}.img
+              fi
+            done
             
-          #   cp out/target/product/${device}/AviumUI*-${device}-${{needs.init_context.outputs.build_subfix}}.zip target/${device}/
-          # done
+            cp out/target/product/${device}/AviumUI*-${device}-${{needs.init_context.outputs.build_subfix}}.zip target/${device}/
+          done
 
-          # cp out/target/product/lemonades/${lemonades_img}.img target/lemonades/${lemonades_img}.img
-          # cp out/target/product/nabu/${nabu_img}.img target/nabu/${nabu_img}.img
+          cp out/target/product/lemonades/${lemonades_img}.img target/lemonades/${lemonades_img}.img
+          cp out/target/product/nabu/${nabu_img}.img target/nabu/${nabu_img}.img
     
-  upload_rom:
-    runs-on: self-hosted
-    needs: [init_context, build_rom]
-    if: ${{ github.event.inputs.upload == 'true' }}
-    defaults:
-      run:
-        working-directory: ${{ needs.init_context.outputs.shared_workdir }}
-    strategy:
-      matrix:
-        device: [lemonades, nabu]
-    env:
-      START_BUILD_TIME: ${{ needs.init_context.outputs.build_start_time }}
-      UPLOAD_PATH: "/OneDrive-Public"
-    steps:
-      - name: Use Dev Upload Path
-        if: ${{ github.event.inputs.build_type == 'dev' }}
-        run: echo "UPLOAD_PATH=${{ env.UPLOAD_PATH}}/dev" >> $GITHUB_ENV
-
-      - name: Upload Artifacts to OpenList
-        run: |
-          python3 uploader/openlist_upload.py "target/${{ matrix.device }}/*" \
-            --base-url ${{ secrets.OPENLIST_HOST }} \
-            --remote-dir "${{ env.UPLOAD_PATH }}/${{ matrix.device }}/avium16/${{ env.START_BUILD_TIME }}/" \
-            --username ${{ secrets.OPENLIST_USERNAME }} \
-            --password ${{ secrets.OPENLIST_PASSWORD }} \
-            --overwrite \
-            --mkdir
-
   build_non-root_boot:
     runs-on: self-hosted
     needs: [init_context, build_rom]
@@ -229,7 +207,7 @@ jobs:
           cp out/target/product/lemonades/boot.img target/lemonades/non-root_boot.img
           cp out/target/product/nabu/boot.img target/nabu/non-root_boot.img
 
-  upload_non-root_boot:
+  upload_rom:
     runs-on: self-hosted
     needs: [init_context, build_non-root_boot]
     if: ${{ github.event.inputs.upload == 'true' }}
@@ -240,22 +218,22 @@ jobs:
       matrix:
         device: [lemonades, nabu]
     env:
-      START_BUILD_TIME: ${{ needs.init_context.outputs.build_start_time }}
       UPLOAD_PATH: "/OneDrive-Public"
     steps:
       - name: Use Dev Upload Path
         if: ${{ github.event.inputs.build_type == 'dev' }}
         run: echo "UPLOAD_PATH=${{ env.UPLOAD_PATH}}/dev" >> $GITHUB_ENV
 
-      - name: Upload Non-Root Boot Images for ${{ matrix.device }}
+      - name: Upload Artifacts to OpenList
         run: |
-          python3 uploader/openlist_upload.py "target/${{ matrix.device }}/non-root_boot.img" \
+          python3 uploader/openlist_upload.py "target/${{ matrix.device }}/*" \
             --base-url ${{ secrets.OPENLIST_HOST }} \
-            --remote-dir "${{ env.UPLOAD_PATH }}/${{ matrix.device }}/avium16/${{ env.START_BUILD_TIME }}/" \
+            --remote-dir "${{ env.UPLOAD_PATH }}/${{ matrix.device }}/avium16/${{ needs.init_context.outputs.build_start_time }}/" \
             --username ${{ secrets.OPENLIST_USERNAME }} \
             --password ${{ secrets.OPENLIST_PASSWORD }} \
             --overwrite \
             --mkdir
+
 
   release_rom:
     runs-on: self-hosted
