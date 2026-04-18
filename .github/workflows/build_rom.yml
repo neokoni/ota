@@ -158,6 +158,10 @@ jobs:
         run: |
           source build/envsetup.sh
           lunch lineage_nabu-bp4a-user
+
+          wget "https://raw.githubusercontent.com/neokoni/ota/refs/heads/main/misc/1_patch_string_for_tablet.patch" || true
+          patch -p0 < 1_patch_string_for_tablet.patch || true
+
           mka bacon -j${{ github.event.inputs.build_threads }}
 
       - name: Copy Rom to Target Location

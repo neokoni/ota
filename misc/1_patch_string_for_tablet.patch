@@ -1,0 +1,36 @@
+diff '--color=auto' -uNr packages/apps/Settings/res/values/avium_strings.xml packages/apps/Settings/res/values/avium_strings.xml
+--- packages/apps/Settings/res/values/avium_strings.xml	2026-02-13 15:12:11.428639989 +0800
++++ packages/apps/Settings/res/values/avium_strings.xml	2026-04-18 16:19:05.253820045 +0800
+@@ -19,7 +19,7 @@
+     <string name="avium_device_info_title">Device Info</string>
+     <string name="avium_ram">RAM</string>
+     <string name="avium_processor">Processor</string>
+-    <string name="avium_phone_model">Phone Model</string>
++    <string name="avium_phone_model">Tablet Model</string>
+     <string name="avium_android_version">Android Version</string>
+     <string name="avium_storage">Storage</string>
+     <string name="avium_system_version">System Version</string>
+diff '--color=auto' -uNr packages/apps/Settings/res/values-zh-rCN/avium_strings.xml packages/apps/Settings/res/values-zh-rCN/avium_strings.xml
+--- packages/apps/Settings/res/values-zh-rCN/avium_strings.xml	2026-02-13 15:12:11.421576570 +0800
++++ packages/apps/Settings/res/values-zh-rCN/avium_strings.xml	2026-04-18 16:17:23.215314296 +0800
+@@ -19,7 +19,7 @@
+     <string name="avium_device_info_title">设备信息</string>
+     <string name="avium_ram">运行内存</string>
+     <string name="avium_processor">处理器</string>
+-    <string name="avium_phone_model">手机型号</string>
++    <string name="avium_phone_model">平板型号</string>
+     <string name="avium_android_version">Android 版本</string>
+     <string name="avium_storage">存储空间</string>
+     <string name="avium_system_version">系统版本</string>
+diff '--color=auto' -uNr packages/apps/Settings/res/values-zh-rTW/avium_strings.xml packages/apps/Settings/res/values-zh-rTW/avium_strings.xml
+--- packages/apps/Settings/res/values-zh-rTW/avium_strings.xml	2026-04-13 22:36:04.920371645 +0800
++++ packages/apps/Settings/res/values-zh-rTW/avium_strings.xml	2026-04-18 16:18:50.416966801 +0800
+@@ -19,7 +19,7 @@
+     <string name="avium_device_info_title">裝置資訊</string>
+     <string name="avium_ram">記憶體</string>
+     <string name="avium_processor">處理器</string>
+-    <string name="avium_phone_model">手機型號</string>
++    <string name="avium_phone_model">平板型號</string>
+     <string name="avium_android_version">Android 版本</string>
+     <string name="avium_storage">儲存空間</string>
+     <string name="avium_system_version">系統版本</string>
