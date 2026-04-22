@@ -11,7 +11,7 @@
           "otaUrl": "/AviumUI/avium-16/nabu/ota.json",
           "releases": [
             {
-              "date": "2099-01-01",
+              "date": "2026-04-22",
               "changes": [
                 "上游代码:",
                 "1. AviumUI上游更新",
