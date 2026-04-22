@@ -252,10 +252,10 @@ jobs:
         run: |
           cd ota
           device_list=("lemonades" "nabu")
-          for device in ${device_list[@]}; do
+          for currDevice in ${device_list[@]}; do
             python3 scripts/generate_ota_json.py \
-              ../target/${{ matrix.device }}/$(ls target/${{ matrix.device }}/ | grep ${{ needs.init_context.outputs.build_subfix }}) \
-              ../out/target/product/${{ matrix.device }}/system/build.prop -y
+              ../target/${currDevice}/$(ls target/${currDevice}/ | grep ${{ needs.init_context.outputs.build_subfix }}) \
+              ../out/target/product/${currDevice}/system/build.prop -y
           done
 
       - name: Release it
