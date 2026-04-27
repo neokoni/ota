@@ -38,8 +38,8 @@ env:
   USER: "neokoni"
   USE_CCACHE: 1
   CCACHE_DIR: "/aosp_build/ccache"
-  BUILD_HOST: NeoBuild
-  BUILD_HOSTNAME: NeoBuild
+  BUILD_HOST: NeoBuilder
+  BUILD_HOSTNAME: NeoBuilder
   BUILD_USER: Neokoni
   BUILD_USERNAME: Neokoni
 
