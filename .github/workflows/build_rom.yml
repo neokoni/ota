@@ -254,7 +254,7 @@ jobs:
           device_list=("lemonades" "nabu")
           for currDevice in ${device_list[@]}; do
             python3 scripts/generate_ota_json.py \
-              ../target/${currDevice}/$(ls target/${currDevice}/ | grep ${{ needs.init_context.outputs.build_subfix }}) \
+              ../target/${currDevice}/$(ls ../target/${currDevice}/ | grep ${{ needs.init_context.outputs.build_subfix }}) \
               ../out/target/product/${currDevice}/system/build.prop -y
           done
 
