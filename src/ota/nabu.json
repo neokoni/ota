@@ -11,8 +11,10 @@
           "otaUrl": "/AviumUI/avium-16/nabu/ota.json",
           "releases": [
             {
-              "date": "2026-05-17",
+              "date": "2026-05-18",
               "changes": [
+                "2026-05-18 HotFix!: 修复vendor使用错误导致的音频问题",
+                "2026-05-17 更新日志: ",
                 "上游代码:",
                 "1. 更新AviumUI 16.2.1 Release",
                 "2. 更新KernelSU",
