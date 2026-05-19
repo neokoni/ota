@@ -126,9 +126,9 @@ const changelogData = computed(() => {
 }
 
 .changelog-card--elevated {
-  background-color: var(--md-sys-color-surface-container-low);
+  background-color: var(--md-sys-color-surface-container-high);
   border: 1px solid var(--md-sys-color-outline-variant);
-  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  box-shadow: var(--md-sys-elevation-level1, 0 1px 3px rgba(0,0,0,0.12));
 }
 
 .card-header {
