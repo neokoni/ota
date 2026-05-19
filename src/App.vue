@@ -68,7 +68,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { themeFromImage, themeFromSourceColor, applyTheme } from '@material/material-color-utilities';
+import { themeFromImage, themeFromSourceColor, applyTheme, DynamicScheme, Hct, SchemeTonalSpot, hexFromArgb } from '@material/material-color-utilities';
 import type { Theme } from '@material/material-color-utilities';
 import { devices } from '@/config/devices';
 import { siteConfig, wallpaperConfig } from '@/config/site';
@@ -104,6 +104,35 @@ function isDarkMode(mode: ThemeMode): boolean {
 
 function applyCurrentTheme(theme: Theme, mode: ThemeMode) {
   applyTheme(theme, { dark: isDarkMode(mode), brightnessSuffix: true });
+  document.body.classList.toggle('dark', isDarkMode(mode));
+  setExtraTokens(theme, isDarkMode(mode));
+}
+
+function setExtraTokens(theme: Theme, dark: boolean) {
+  const scheme = new SchemeTonalSpot(Hct.fromInt(theme.source), dark, 0.0);
+  const extras: Record<string, number> = {
+    'surface-dim': scheme.surfaceDim,
+    'surface-bright': scheme.surfaceBright,
+    'surface-container-lowest': scheme.surfaceContainerLowest,
+    'surface-container-low': scheme.surfaceContainerLow,
+    'surface-container': scheme.surfaceContainer,
+    'surface-container-high': scheme.surfaceContainerHigh,
+    'surface-container-highest': scheme.surfaceContainerHighest,
+    'outline-variant': scheme.outlineVariant,
+  };
+  for (const [key, value] of Object.entries(extras)) {
+    const token = `--md-sys-color-${key}`;
+    const color = hexFromArgb(value);
+    document.body.style.setProperty(token, color);
+  }
+}
+
+let darkMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+function onMediaDarkChange() {
+  if (themeMode.value === 'auto' && loadedTheme) {
+    applyCurrentTheme(loadedTheme, themeMode.value);
+  }
 }
 
 function toggleTheme() {
@@ -157,11 +186,13 @@ onMounted(() => {
     themeMode.value = saved;
   }
 
+  darkMediaQuery.addEventListener('change', onMediaDarkChange);
   window.addEventListener('scroll', handleScroll);
   initDynamicColors();
 });
 
 onUnmounted(() => {
+  darkMediaQuery.removeEventListener('change', onMediaDarkChange);
   window.removeEventListener('scroll', handleScroll);
 });
 
