@@ -100,6 +100,8 @@ jobs:
 
       - name: Checkout Device Trees
         run: |
+          rm -rf hardware/qcom-caf/sm8150/display || true
+          git clone https://github.com/neokoni/android_hardware_qcom_display hardware/qcom-caf/sm8150/display -b lineage-23.2-caf-sm8150 || true
           git clone https://github.com/neokoni/android_device_xiaomi_nabu device/xiaomi/nabu || true
           git clone https://github.com/neokoni/android_kernel_xiaomi_nabu kernel/xiaomi/nabu || true
           git clone https://github.com/neokoni/android_vendor_xiaomi_nabu  vendor/xiaomi/nabu --depth=1 || true
