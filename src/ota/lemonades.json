@@ -3,6 +3,24 @@
   "name": "OnePlus 9R",
   "systems": [
     {
+      "name": "uwuAOSP",
+      "versions": [
+        {
+          "version": "uwu-16",
+          "label": "类原生 uwuAOSP 16",
+          "otaUrl": "/uwuAOSP/uwu-16/lemonades/ota.json",
+          "releases": [
+            {
+              "date": "2099-12-31",
+              "changes": [
+                "**初始构建**"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "AviumUI",
       "versions": [
         {

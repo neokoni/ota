@@ -2,6 +2,27 @@
   "codename": "nabu",
   "name": "Xiaomi Pad 5",
   "systems": [
+        {
+      "name": "uwuAOSP",
+      "versions": [
+        {
+          "version": "uwu-16",
+          "label": "类原生 uwuAOSP 16",
+          "otaUrl": "/uwuAOSP/uwu-16/nabu/ota.json",
+          "releases": [
+            {
+              "date": "2099-12-31",
+              "changes": [
+                "**初始构建**",
+                "设备树:",
+                "1. 优化屏幕颜色, 可设置选项同步原厂",
+                "2. 引入原厂自动亮度配置"
+              ]
+            }
+          ]
+        }
+      ]
+    },
     {
       "name": "AviumUI",
       "versions": [

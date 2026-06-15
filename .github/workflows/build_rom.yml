@@ -26,6 +26,11 @@ on:
         description: 'Number of threads to use for syncing the source'
         required: true
         default: 6
+      ota_info_args:
+        type: string
+        description: 'Arguments for generating ota.json'
+        required: false
+        default: ''
 
 defaults:
   run:
@@ -258,7 +263,7 @@ jobs:
           for currDevice in ${device_list[@]}; do
             python3 scripts/generate_ota_json.py \
               ../target/${currDevice}/$(ls ../target/${currDevice}/ | grep ${{ needs.init_context.outputs.build_subfix }}) \
-              ../out/target/product/${currDevice}/system/build.prop -y
+              ../out/target/product/${currDevice}/system/build.prop -y ${{ github.event.inputs.ota_info_args }}
           done
 
       - name: Release it
