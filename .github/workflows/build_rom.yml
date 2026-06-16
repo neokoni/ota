@@ -101,7 +101,7 @@ jobs:
           avium get_gms --cli --update-local-manifests --run-sync
 
       - name: Checkout Signing Keys
-        run: git clone https://github.com/neokoni/android_vendor_lineage-priv_keys vendor/lineage-priv/keys --depth=1 || true
+        run: git clone https://github.com/neokoni/android_private_keys keys --depth=1 || true
 
       - name: Checkout Device Trees
         run: |
@@ -159,7 +159,18 @@ jobs:
         run: |
           source build/envsetup.sh
           lunch lineage_lemonades-bp4a-user
-          mka bacon -j${{ github.event.inputs.build_threads }}
+          mka target-files-package otatools -j${{ github.event.inputs.build_threads }}
+
+      - name: Signing OTA package for lemonades
+        run: |
+          source build/envsetup.sh
+          lunch lineage_lemonades-bp4a-user
+          mkdir -p ./tmp || true
+
+          bash ota/scripts/sign_ota_packages.sh \
+            lineage_lemonades \
+            keys \
+            AviumUI-16.2.1-lemonades-${{ needs.init_context.outputs.build_subfix }}-signed
 
       - name: Build Rom for nabu
         run: |
@@ -169,7 +180,18 @@ jobs:
           wget "https://raw.githubusercontent.com/neokoni/ota/refs/heads/main/misc/1_patch_string_for_tablet.patch" || true
           patch -p0 < 1_patch_string_for_tablet.patch || true
 
-          mka bacon -j${{ github.event.inputs.build_threads }}
+          mka target-files-package otatools -j${{ github.event.inputs.build_threads }}
+
+      - name: Signing OTA package for nabu
+        run: |
+          source build/envsetup.sh
+          lunch lineage_nabu-bp4a-user
+          mkdir -p ./tmp || true
+
+          bash ota/scripts/sign_ota_packages.sh \
+            lineage_nabu \
+            keys \
+            AviumUI-16.2.1-nabu-${{ needs.init_context.outputs.build_subfix }}-signed
 
       - name: Copy Rom to Target Location
         run: |
@@ -186,7 +208,7 @@ jobs:
               fi
             done
             
-            cp out/target/product/${device}/AviumUI*-${device}-${{needs.init_context.outputs.build_subfix}}.zip target/${device}/
+            cp AviumUI*-${device}-${{needs.init_context.outputs.build_subfix}}-signed.zip target/${device}/
           done
 
           cp out/target/product/lemonades/${lemonades_img}.img target/lemonades/${lemonades_img}.img
