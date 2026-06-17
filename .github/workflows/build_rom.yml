@@ -159,7 +159,7 @@ jobs:
         run: |
           source build/envsetup.sh
           lunch lineage_lemonades-bp4a-user
-          mka target-files-package otatools -j${{ github.event.inputs.build_threads }}
+          mka target-files-package otatools -j${{ github.event.inputs.build_threads }} || (sleep 120 && mka target-files-package otatools -j8)
 
       - name: Signing OTA package for lemonades
         run: |
@@ -180,7 +180,7 @@ jobs:
           wget "https://raw.githubusercontent.com/neokoni/ota/refs/heads/main/misc/1_patch_string_for_tablet.patch" || true
           patch -p0 < 1_patch_string_for_tablet.patch || true
 
-          mka target-files-package otatools -j${{ github.event.inputs.build_threads }}
+          mka target-files-package otatools -j${{ github.event.inputs.build_threads }} || (sleep 120 && mka target-files-package otatools -j8)
 
       - name: Signing OTA package for nabu
         run: |
