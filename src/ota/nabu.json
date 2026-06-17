@@ -32,6 +32,17 @@
           "otaUrl": "/AviumUI/avium-16/nabu/ota.json",
           "releases": [
             {
+              "date": "2026-06-17",
+              "changes": [
+                "上游代码:",
+                "1. 更新AviumUI",
+                "2. 更新KernelSU",
+                "设备树:",
+                "1. 优化屏幕颜色, 可设置选项同步原厂",
+                "2. 引入原厂自动亮度配置"
+              ]
+            },
+            {
               "date": "2026-05-18",
               "changes": [
                 "2026-05-18 HotFix!: 修复vendor使用错误导致的音频问题",
