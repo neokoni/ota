@@ -82,7 +82,7 @@ jobs:
               zip curl zlib1g-dev libc6-dev-i386 libncurses6 lib32ncurses-dev \
               x11proto-core-dev libx11-dev lib32z1-dev libgl1-mesa-dev \
               libxml2-utils xsltproc unzip fontconfig libssl-dev openjdk-8-jdk \
-              repo ccache git-lfs libelf-dev rsync python3-pip python-is-python3
+              repo ccache git-lfs libelf-dev rsync python3-pip python-is-python3 screen
 
       - name: Install GitHub Runner
         uses: appleboy/ssh-action@v1
@@ -120,7 +120,7 @@ jobs:
             # Configure the runner
             echo "bash config.sh --url https://github.com/neokoni/ota --token ${{ github.event.inputs.runner_token }} --work ${{ env.RUNNER_WORKDIR }} --replace --unattended" >> setup.sh
             su ${{ github.event.inputs.runner_user }} -c "bash setup.sh"
-            bash svc.sh install ${{ github.event.inputs.runner_user }}
-            bash svc.sh start
+            su ${{ github.event.inputs.runner_user }} -c "screen -dmS runner bash run.sh"
+            
 
   
