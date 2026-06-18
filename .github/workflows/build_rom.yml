@@ -226,7 +226,7 @@ jobs:
           cp lemonades_extracted/${lemonades_img}.img target/lemonades/${lemonades_img}.img
           cp nabu_extracted//${nabu_img}.img target/nabu/${nabu_img}.img
     
-  build_non-root_boot:
+  build_rooted_boot:
     runs-on: self-hosted
     needs: [init_context, build_rom]
     defaults:
@@ -235,26 +235,26 @@ jobs:
     env:
       KSU_CONFIG: "arch/arm64/configs/vendor/ksu.config"
     steps:
-      - name: Build Non-Root Boot Images (lemonades)
+      - name: Build Rooted Boot Images (lemonades)
         run: |
           source build/envsetup.sh
           lunch lineage_lemonades-bp4a-user
-          sed -i 's/y/n/g' kernel/oneplus/sm8250/${{ env.KSU_CONFIG }}
+          sed -i 's/n/y/g' kernel/oneplus/sm8250/${{ env.KSU_CONFIG }}
           mka bootimage -j${{ github.event.inputs.build_threads }}
-      - name: Build Non-Root Boot Images (nabu)
+      - name: Build Rooted Boot Images (nabu)
         run: |
           source build/envsetup.sh
-          sed -i 's/y/n/g' kernel/xiaomi/nabu/${{ env.KSU_CONFIG }}
+          sed -i 's/n/y/g' kernel/xiaomi/nabu/${{ env.KSU_CONFIG }}
           lunch lineage_nabu-bp4a-user
           mka bootimage -j${{ github.event.inputs.build_threads }}
-      - name: Copy Non-Root Boot Images to Target Location
+      - name: Copy Rooted Boot Images to Target Location
         run: |
-          cp out/target/product/lemonades/boot.img target/lemonades/non-root_boot.img
-          cp out/target/product/nabu/boot.img target/nabu/non-root_boot.img
+          cp out/target/product/lemonades/boot.img target/lemonades/rooted_boot.img
+          cp out/target/product/nabu/boot.img target/nabu/rooted_boot.img
 
   upload_rom:
     runs-on: self-hosted
-    needs: [init_context, build_non-root_boot]
+    needs: [init_context, build_rooted_boot]
     if: ${{ github.event.inputs.upload == 'true' }}
     defaults:
       run:
