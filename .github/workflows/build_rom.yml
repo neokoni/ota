@@ -73,8 +73,8 @@ jobs:
   ready_devices:
     needs: init_context
     env:
-      ANDROID_MANIFEST: "https://github.com/AviumUI/android_manifests"
-      ANDROID_BRANCH: "avium-16.2"
+      ANDROID_MANIFEST: "https://github.com/uwuAOSP/platform_manifests.git"
+      ANDROID_BRANCH: "uwu-16.2"
       REPO_INIT_ARGS: "--depth=1 --git-lfs"
       REPO_SYNC_ARGS: "-j${{ github.event.inputs.sync_threads }} -c --no-clone-bundle --no-tags --optimized-fetch --prune --force-sync"
     defaults:
@@ -94,11 +94,6 @@ jobs:
         run: |
           repo init -u ${{ env.ANDROID_MANIFEST}} -b ${{ env.ANDROID_BRANCH}} ${{ env.REPO_INIT_ARGS}}
           repo sync ${{ env.REPO_SYNC_ARGS}}
-
-      - name: Fetch GMS vendor
-        run: |
-          source build/envsetup.sh
-          avium get_gms --cli --update-local-manifests --run-sync
 
       - name: Checkout Signing Keys
         run: git clone https://github.com/neokoni/android_private_keys keys --depth=1 || true
@@ -165,40 +160,37 @@ jobs:
       - name: Build Rom for lemonades
         run: |
           source build/envsetup.sh
-          lunch lineage_lemonades-bp4a-user
+          lunch custom_lemonades-bp4a-user
           mka target-files-package otatools -j${{ github.event.inputs.build_threads }} || (sleep 120 && mka target-files-package otatools -j10)
 
       - name: Signing OTA package for lemonades
         run: |
           source build/envsetup.sh
-          lunch lineage_lemonades-bp4a-user
+          lunch custom_lemonades-bp4a-user
           mkdir -p ./tmp || true
 
           bash ota/scripts/sign_ota_packages.sh \
-            lineage_lemonades \
+            custom_lemonades \
             keys \
-            AviumUI-16.2.1-lemonades-${{ needs.init_context.outputs.build_subfix }}-signed
+            uwuAOSP_lemonades-${{ needs.init_context.outputs.build_subfix }}-signed
 
       - name: Build Rom for nabu
         run: |
           source build/envsetup.sh
-          lunch lineage_nabu-bp4a-user
-
-          wget "https://raw.githubusercontent.com/neokoni/ota/refs/heads/main/misc/1_patch_string_for_tablet.patch" || true
-          patch -p0 < 1_patch_string_for_tablet.patch || true
+          lunch custom_nabu-bp4a-user
 
           mka target-files-package otatools -j${{ github.event.inputs.build_threads }} || (sleep 120 && mka target-files-package otatools -j10)
 
       - name: Signing OTA package for nabu
         run: |
           source build/envsetup.sh
-          lunch lineage_nabu-bp4a-user
+          lunch custom_nabu-bp4a-user
           mkdir -p ./tmp || true
 
           bash ota/scripts/sign_ota_packages.sh \
-            lineage_nabu \
+            custom_nabu \
             keys \
-            AviumUI-16.2.1-nabu-${{ needs.init_context.outputs.build_subfix }}-signed
+            uwuAOSP_nabu-${{ needs.init_context.outputs.build_subfix }}-signed
 
       - name: Copy Rom to Target Location
         run: |
@@ -208,7 +200,7 @@ jobs:
           upload_img=("boot" "dtbo" "vbmeta")
 
           for device in ${all_devices[@]}; do
-            ./payload-dumper-go AviumUI*-${device}-${{needs.init_context.outputs.build_subfix}}-signed.zip
+            ./payload-dumper-go uwuAOSP_${device}-${{needs.init_context.outputs.build_subfix}}-signed.zip
             mv extracted* ${device}_extracted
           done
 
@@ -220,7 +212,7 @@ jobs:
               fi
             done
             
-            cp AviumUI*-${device}-${{needs.init_context.outputs.build_subfix}}-signed.zip target/${device}/
+            cp uwuAOSP*-${device}-${{needs.init_context.outputs.build_subfix}}-signed.zip target/${device}/
           done
 
           cp lemonades_extracted/${lemonades_img}.img target/lemonades/${lemonades_img}.img
@@ -238,14 +230,14 @@ jobs:
       - name: Build Non-Root Boot Images (lemonades)
         run: |
           source build/envsetup.sh
-          lunch lineage_lemonades-bp4a-user
+          lunch custom_lemonades-bp4a-user
           sed -i 's/y/n/g' kernel/oneplus/sm8250/${{ env.KSU_CONFIG }}
           mka bootimage -j${{ github.event.inputs.build_threads }}
       - name: Build Non-Root Boot Images (nabu)
         run: |
           source build/envsetup.sh
           sed -i 's/y/n/g' kernel/xiaomi/nabu/${{ env.KSU_CONFIG }}
-          lunch lineage_nabu-bp4a-user
+          lunch custom_nabu-bp4a-user
           mka bootimage -j${{ github.event.inputs.build_threads }}
       - name: Copy Non-Root Boot Images to Target Location
         run: |
@@ -273,7 +265,7 @@ jobs:
         run: |
           python3 uploader/openlist_upload.py "target/${{ matrix.device }}/*" \
             --base-url ${{ secrets.OPENLIST_HOST }} \
-            --remote-dir "${{ env.UPLOAD_PATH }}/${{ matrix.device }}/avium16/${{ needs.init_context.outputs.build_start_time }}/" \
+            --remote-dir "${{ env.UPLOAD_PATH }}/${{ matrix.device }}/uwu16/${{ needs.init_context.outputs.build_start_time }}/" \
             --username ${{ secrets.OPENLIST_USERNAME }} \
             --password ${{ secrets.OPENLIST_PASSWORD }} \
             --as-task \
