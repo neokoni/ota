@@ -76,7 +76,7 @@ jobs:
       ANDROID_MANIFEST: "https://github.com/AviumUI/android_manifests"
       ANDROID_BRANCH: "avium-16.2"
       REPO_INIT_ARGS: "--depth=1 --git-lfs"
-      REPO_SYNC_ARGS: "-j${{ github.event.inputs.sync_threads }} --force-sync --no-clone-bundle --no-tags"
+      REPO_SYNC_ARGS: "-j${{ github.event.inputs.sync_threads }} -c --no-clone-bundle --no-tags --optimized-fetch --prune --force-sync"
     defaults:
       run:
         working-directory: ${{ needs.init_context.outputs.shared_workdir }}
