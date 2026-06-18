@@ -29,6 +29,16 @@
           "otaUrl": "/AviumUI/avium-16/lemonades/ota.json",
           "releases": [
             {
+              "date": "2026-06-18",
+              "changes": [
+                "上游代码:",
+                "1. 更新AviumUI",
+                "2. 更新KernelSU",
+                "设备树:",
+                "优化自动亮度配置, 感谢<a href=\"https://github.com/neokoni/android_device_oneplus_lemonades/pull/1\" target=\"_blank\">@KMnO4y_Fish0</a>"
+              ]
+            },
+            {
               "date": "2026-05-17",
               "changes": [
                 "上游代码:",
