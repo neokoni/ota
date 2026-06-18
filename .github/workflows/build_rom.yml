@@ -30,7 +30,7 @@ on:
         type: string
         description: 'Arguments for generating ota.json'
         required: false
-        default: ''
+        default: '--os=uwuAOSP --version=uwu-16'
 
 defaults:
   run:
