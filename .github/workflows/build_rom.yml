@@ -144,7 +144,14 @@ jobs:
           cd kernel/oneplus/sm8250
           rm -rf KernelSU drivers/kernelsu
           curl -LSs "https://raw.githubusercontent.com/rsuntk/KernelSU/main/kernel/setup.sh" | bash -s main
-    
+
+      - name: Setup payload-dumper-go
+        run: |
+          sudo apt install wget -y
+          if [ ! -d payload-dumper-go ]; then
+            wget https://github.com/ssut/payload-dumper-go/releases/download/1.3.0/payload-dumper-go_1.3.0_linux_amd64.tar.gz
+            tar -xzf payload-dumper-go_1.3.0_linux_amd64.tar.gz
+          fi
 
   build_rom:
     runs-on: self-hosted
@@ -159,7 +166,7 @@ jobs:
         run: |
           source build/envsetup.sh
           lunch lineage_lemonades-bp4a-user
-          mka target-files-package otatools -j${{ github.event.inputs.build_threads }} || (sleep 120 && mka target-files-package otatools -j8)
+          mka target-files-package otatools -j${{ github.event.inputs.build_threads }} || (sleep 120 && mka target-files-package otatools -j10)
 
       - name: Signing OTA package for lemonades
         run: |
@@ -180,7 +187,7 @@ jobs:
           wget "https://raw.githubusercontent.com/neokoni/ota/refs/heads/main/misc/1_patch_string_for_tablet.patch" || true
           patch -p0 < 1_patch_string_for_tablet.patch || true
 
-          mka target-files-package otatools -j${{ github.event.inputs.build_threads }} || (sleep 120 && mka target-files-package otatools -j8)
+          mka target-files-package otatools -j${{ github.event.inputs.build_threads }} || (sleep 120 && mka target-files-package otatools -j10)
 
       - name: Signing OTA package for nabu
         run: |
@@ -198,21 +205,26 @@ jobs:
           nabu_img=vendor_boot
           lemonades_img=recovery
           all_devices=("lemonades" "nabu")
-          upload_img=("boot" "dtbo" "super_empty")
+          upload_img=("boot" "dtbo" "vbmeta")
+
+          for device in ${all_devices[@]}; do
+            ./payload-dumper-go AviumUI*-${device}-${{needs.init_context.outputs.build_subfix}}-signed.zip
+            mv extracted* ${device}_extracted
+          done
 
           for device in ${all_devices[@]}; do
             mkdir -p target/${device}
             for img in ${upload_img[@]}; do
-              if [ -f out/target/product/${device}/${img}.img ]; then
-                cp out/target/product/${device}/${img}.img target/${device}/${img}.img
+              if [ -f ${device}_extracted/${device}/${img}.img ]; then
+                cp ${device}_extracted/${device}/${img}.img target/${device}/${img}.img
               fi
             done
             
             cp AviumUI*-${device}-${{needs.init_context.outputs.build_subfix}}-signed.zip target/${device}/
           done
 
-          cp out/target/product/lemonades/${lemonades_img}.img target/lemonades/${lemonades_img}.img
-          cp out/target/product/nabu/${nabu_img}.img target/nabu/${nabu_img}.img
+          cp lemonades_extracted/${lemonades_img}.img target/lemonades/${lemonades_img}.img
+          cp nabu_extracted//${nabu_img}.img target/nabu/${nabu_img}.img
     
   build_non-root_boot:
     runs-on: self-hosted
