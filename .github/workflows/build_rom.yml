@@ -68,7 +68,7 @@ jobs:
           
           echo "build_start_time=$PRE_BUILD_START_TIME" >> $GITHUB_OUTPUT
           echo "shared_workdir=/aosp_build" >> $GITHUB_OUTPUT
-          echo "build_subfix=$(date +%Y%m%d)-Unofficial-GMS" >> $GITHUB_OUTPUT
+          echo "build_subfix=bamberga-$(date +%Y%m%d)" >> $GITHUB_OUTPUT
 
   ready_devices:
     needs: init_context
