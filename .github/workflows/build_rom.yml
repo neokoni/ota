@@ -60,7 +60,7 @@ jobs:
       - name: Init Global Context
         id: context
         run: |
-          PRE_BUILD_START_TIME=$(date +%Y-%m-%d)
+          PRE_BUILD_START_TIME=$(date +%Y-%m-%d -u)
 
           if [ ${{ github.event.inputs.build_type}} == 'dev' ]; then
             PRE_BUILD_START_TIME="${PRE_BUILD_START_TIME}-$(date +%H%M)"
@@ -68,7 +68,7 @@ jobs:
           
           echo "build_start_time=$PRE_BUILD_START_TIME" >> $GITHUB_OUTPUT
           echo "shared_workdir=/aosp_build" >> $GITHUB_OUTPUT
-          echo "build_subfix=bamberga-$(date +%Y%m%d)" >> $GITHUB_OUTPUT
+          echo "build_subfix=bamberga-$(date +%Y%m%d -u)" >> $GITHUB_OUTPUT
 
   ready_devices:
     needs: init_context
