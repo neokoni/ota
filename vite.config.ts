@@ -63,7 +63,7 @@ const buildBpPlainText = (codename: string, systemName: string, version: string)
 
   return releases
     .map((release) => {
-      const content = (release.changes || []).map((line) => stripHtml(line)).join('\n');
+      const content = (release.changes || []).map((line) => stripHtml(line)).join('  \n');
       return `${release.date}\n==================\n${content}`;
     })
     .join('\n\n');
