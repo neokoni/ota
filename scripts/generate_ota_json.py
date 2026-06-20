@@ -184,17 +184,11 @@ def main():
     else:
         date_formatted = date_str # assume already formatted or handle error?
 
-    # URL Version part: avium16 (lowercase name + version)
-    # If args.version is provided, use it directly? 
-    # The user example was --version=avium16
+    # URL Version part: avium-16
     if args.version:
-        url_ver_part = truncate_version_at_dot(args.version)
-        # Update path_ver_part logic if possible or assume standard
-        # Original: path_ver_part = f"{rom_name_normalized}-{rom_ver}"
-        # If version arg is avium16, we might not know rom_ver distinct from rom_name
-        # Let's assume user provides what they want for the URL segment
+        url_ver_part = args.version
     else:
-        url_ver_part = f"{rom_name_normalized}{rom_ver}"
+        url_ver_part = f"{rom_name_normalized}-{rom_ver}"
 
     # Re-evaluate device codename if needed (not passed in args currently, maybe add?)
     # User didn't ask for device override, so keep from filename
@@ -225,8 +219,7 @@ def main():
     # Path version part: avium-16 (lowercase name + - + version)
     
     if args.version:
-         # Truncate version at first dot, then use for path
-         path_ver_part = truncate_version_at_dot(args.version)
+        path_ver_part = args.version
     else:
         path_ver_part = f"{rom_name_normalized}-{rom_ver}" # avium-16
     
