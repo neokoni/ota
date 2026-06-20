@@ -176,7 +176,7 @@ def main():
         rom_name_normalized = rom_name_normalized[:-2]
 
     # URL Construction
-    # https://pan.neokoni.ink/d/OneDrive-Public/lemonades/avium16/2025-12-08/AviumUI-16-lemonades-20251208-Unofficial-GMS.zip
+    # https://pan.neokoni.ink/d/OneDrive-Public/lemonades/AviumUI/avium16/2025-12-08/AviumUI-16-lemonades-20251208-Unofficial-GMS.zip
     
     # Format date: 20251208 -> 2025-12-08
     if len(date_str) == 8:
@@ -200,7 +200,7 @@ def main():
     # User didn't ask for device override, so keep from filename
     # Apply version truncation to path_ver_part as well (will be set in next block)
     
-    url = f"{args.base_url}/{device_codename}/{url_ver_part}/{date_formatted}/{zip_filename}"
+    url = f"{args.base_url}/{device_codename}/{rom_name}/{url_ver_part}/{date_formatted}/{zip_filename}"
     
     print(f"  Parsed Device: {device_codename}")
     print(f"  Parsed Version: {version_str}")
