@@ -26,11 +26,6 @@ on:
         description: 'Number of threads to use for syncing the source'
         required: true
         default: 6
-      ota_info_args:
-        type: string
-        description: 'Arguments for generating ota.json'
-        required: false
-        default: '--os=uwuAOSP --version=uwu-16'
 
 defaults:
   run:
@@ -47,6 +42,8 @@ env:
   BUILD_HOSTNAME: NeoBuilder
   BUILD_USER: Neokoni
   BUILD_USERNAME: Neokoni
+  BUILD_OS_NAME: uwuAOSP
+  BUILD_OS_VERSION: uwu-16.2
 
 
 jobs:
@@ -212,7 +209,7 @@ jobs:
               fi
             done
             
-            cp uwuAOSP*-${device}-${{needs.init_context.outputs.build_subfix}}-signed.zip target/${device}/
+            cp uwuAOSP*_${device}-${{needs.init_context.outputs.build_subfix}}-signed.zip target/${device}/
           done
 
           cp lemonades_extracted/${lemonades_img}.img target/lemonades/${lemonades_img}.img
@@ -289,7 +286,10 @@ jobs:
           for currDevice in ${device_list[@]}; do
             python3 scripts/generate_ota_json.py \
               ../target/${currDevice}/$(ls ../target/${currDevice}/ | grep ${{ needs.init_context.outputs.build_subfix }}) \
-              ../out/target/product/${currDevice}/system/build.prop -y ${{ github.event.inputs.ota_info_args }}
+              ../out/target/product/${currDevice}/system/build.prop \
+              --os=${{ env.BUILD_OS_NAME }} \
+              --version=${{ env.BUILD_OS_VERSION }} \
+              --device=${currDevice}
           done
 
       - name: Release it
