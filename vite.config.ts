@@ -49,12 +49,12 @@ const loadOtaDevices = (): OtaDevice[] => {
 
 const otaDevices = loadOtaDevices();
 
-const buildBpPlainText = (codename: string): string | null => {
+const buildBpPlainText = (codename: string, systemName: string, version: string): string | null => {
   const device = otaDevices.find((item) => item.codename === codename);
   if (!device) return null;
 
-  const aviumSystem = device.systems?.find((system) => system.name === 'AviumUI');
-  const targetVersion = aviumSystem?.versions?.find((version) => version.version === 'avium-16');
+  const system = device.systems?.find((s) => s.name === systemName);
+  const targetVersion = system?.versions?.find((v) => v.version === version);
   if (!targetVersion?.releases?.length) return null;
 
   const releases = [...targetVersion.releases].sort(
@@ -71,7 +71,7 @@ const buildBpPlainText = (codename: string): string | null => {
 
 const alwaysPlainTextPrefix = '/plain/device';
 
-const parseAvium16DeviceFromPath = (pathname: string, prefix = '/device'): string | null => {
+const parseDeviceFromPath = (pathname: string, prefix = '/device'): { codename: string; systemName: string; version: string } | null => {
   const normalizedPrefix = prefix.split('/').filter(Boolean);
   const segments = pathname.split('/').filter(Boolean);
   const requiredLength = normalizedPrefix.length + 3;
@@ -86,11 +86,20 @@ const parseAvium16DeviceFromPath = (pathname: string, prefix = '/device'): strin
   const systemIndex = codenameIndex + 1;
   const versionIndex = codenameIndex + 2;
 
-  if (segments[systemIndex] !== 'AviumUI' || segments[versionIndex] !== 'avium-16') {
-    return null;
-  }
+  const codename = decodeURIComponent(segments[codenameIndex]);
+  const systemName = decodeURIComponent(segments[systemIndex]);
+  const version = decodeURIComponent(segments[versionIndex]);
 
-  return decodeURIComponent(segments[codenameIndex]);
+  const device = otaDevices.find((d) => d.codename === codename);
+  if (!device) return null;
+
+  const system = device.systems?.find((s) => s.name === systemName);
+  if (!system) return null;
+
+  const versionCfg = system.versions?.find((v) => v.version === version);
+  if (!versionCfg) return null;
+
+  return { codename, systemName, version };
 };
 
 const bpPlainTextMiddleware = (): Plugin => {
@@ -103,14 +112,14 @@ const bpPlainTextMiddleware = (): Plugin => {
       }
 
       const pathname = new URL(req.url || '/', 'http://localhost').pathname;
-      const codename = parseAvium16DeviceFromPath(pathname, '/device');
-      
-      if (!codename) {
+      const parsed = parseDeviceFromPath(pathname, '/device');
+
+      if (!parsed) {
         next();
         return;
       }
 
-      const plainText = buildBpPlainText(codename);
+      const plainText = buildBpPlainText(parsed.codename, parsed.systemName, parsed.version);
       if (!plainText) {
         res.statusCode = 404;
         res.setHeader('Content-Type', 'text/plain; charset=utf-8');
@@ -139,13 +148,13 @@ const alwaysPlainTextPagePlugin = (): Plugin => {
   const register = (middlewares: Connect.Server) => {
     middlewares.use((req, res, next) => {
       const pathname = new URL(req.url || '/', 'http://localhost').pathname;
-      const codename = parseAvium16DeviceFromPath(pathname, alwaysPlainTextPrefix);
-      if (!codename) {
+      const parsed = parseDeviceFromPath(pathname, alwaysPlainTextPrefix);
+      if (!parsed) {
         next();
         return;
       }
 
-      const plainText = buildBpPlainText(codename);
+      const plainText = buildBpPlainText(parsed.codename, parsed.systemName, parsed.version);
       if (!plainText) {
         res.statusCode = 404;
         res.setHeader('Content-Type', 'text/plain; charset=utf-8');
@@ -169,14 +178,18 @@ const alwaysPlainTextPagePlugin = (): Plugin => {
     },
     generateBundle() {
       otaDevices.forEach((device) => {
-        const content = buildBpPlainText(device.codename);
-        if (!content) return;
+        device.systems?.forEach((sys) => {
+          sys.versions?.forEach((ver) => {
+            const content = buildBpPlainText(device.codename, sys.name, ver.version);
+            if (!content) return;
 
-        const fileName = `plain/device/${encodeURIComponent(device.codename)}/AviumUI/avium-16/index.txt`;
-        this.emitFile({
-          type: 'asset',
-          fileName,
-          source: content,
+            const fileName = `plain/device/${encodeURIComponent(device.codename)}/${encodeURIComponent(sys.name)}/${encodeURIComponent(ver.version)}/index.txt`;
+            this.emitFile({
+              type: 'asset',
+              fileName,
+              source: content,
+            });
+          });
         });
       });
     },
