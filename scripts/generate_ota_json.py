@@ -40,6 +40,7 @@ def main():
     parser.add_argument("files", nargs='+', help="Path to .zip and .prop files")
     parser.add_argument("--version", help="Override version (e.g. avium16)")
     parser.add_argument("--os", help="Override OS name (e.g. AviumUI)")
+    parser.add_argument("--device", help="Override device codename (e.g. lemonades)")
     parser.add_argument("--date", help="Override date (e.g. 2026-02-26)")
     parser.add_argument("--base-url", default=DEFAULT_BASE_URL, help="Override base URL")
     parser.add_argument("-y", "--yes", action="store_true", help="Skip confirmation and save directly")
@@ -163,6 +164,9 @@ def main():
 
     if args.os:
         rom_name = args.os
+
+    if args.device:
+        device_codename = args.device
 
     # Recalculate derived values based on potential overrides
     
