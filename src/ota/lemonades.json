@@ -11,6 +11,15 @@
           "otaUrl": "/uwuAOSP/uwu-16/lemonades/ota.json",
           "releases": [
             {
+              "date": "2026-07-09",
+              "changes": [
+                "上游代码:",
+                "更新uwuAOSP源码",
+                "设备树:",
+                "加入了一些来自<a target=\"_blank\" href=\"https://github.com/crdroidandroid/android_device_oneplus_sm8250-common\">crdroid</a>的sm8250-common提交, 感谢8T的crd维护者"
+              ]
+            },
+            {
               "date": "2026-06-20",
               "changes": [
                 "**初始构建**"

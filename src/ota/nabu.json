@@ -11,6 +11,12 @@
           "otaUrl": "/uwuAOSP/uwu-16/nabu/ota.json",
           "releases": [
             {
+              "date": "2026-07-09",
+              "changes": [
+                "更新uwuAOSP源码"
+              ]
+            },
+            {
               "date": "2026-06-20",
               "changes": [
                 "**初始构建**"
