@@ -11,6 +11,16 @@
           "otaUrl": "/uwuAOSP/uwu-16/lemonades/ota.json",
           "releases": [
             {
+              "date": "2026-07-29",
+              "changes": [
+                "上游代码:",
+                "更新uwuAOSP源码",
+                "设备树:",
+                "1. 尝试优化功耗和发热",
+                "2. 合并上游内核更改"
+              ]
+            },
+            {
               "date": "2026-07-09",
               "changes": [
                 "上游代码:",
