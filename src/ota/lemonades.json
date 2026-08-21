@@ -11,6 +11,16 @@
           "otaUrl": "/uwuAOSP/uwu-16/lemonades/ota.json",
           "releases": [
             {
+              "date": "2026-08-21",
+              "changes": [
+                "上游代码:",
+                "更新uwuAOSP源码",
+                "设备树:",
+                "1. 加入手电筒亮度调节",
+                "2. 合并上游内核更改"
+              ]
+            },
+            {
               "date": "2026-07-29",
               "changes": [
                 "上游代码:",
