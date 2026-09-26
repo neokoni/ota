@@ -31,7 +31,7 @@ https://ota.neokoni.ink/AviumUI/avium-16/nabu/ota.json
       "filename": "AviumUI-16.2.0-nabu-20260226-Unofficial-GMS.zip",
       "id": "618bedfd390a3031da6bd063ac21d6d68b2e2faf",
       "size": 2590263421,
-      "url": "https://pan.neokoni.ink/d/OneDrive-Public/nabu/avium16/2026-02-26/AviumUI-16.2.0-nabu-20260226-Unofficial-GMS.zip",
+      "url": "https://pan.neokoni.ink/d/NeoBuilds/nabu/avium16/2026-02-26/AviumUI-16.2.0-nabu-20260226-Unofficial-GMS.zip",
       "version": "AviumUI-16.2.0-nabu"
     }
   ]

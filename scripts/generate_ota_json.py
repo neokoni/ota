@@ -6,7 +6,7 @@ import re
 import argparse
 
 # Default Configuration
-DEFAULT_BASE_URL = "https://pan.neokoni.ink/d/OneDrive-Public"
+DEFAULT_BASE_URL = "https://pan.neokoni.ink/d/NeoBuilds"
 
 def get_sha1(file_path):
     sha1 = hashlib.sha1()
@@ -176,7 +176,7 @@ def main():
         rom_name_normalized = rom_name_normalized[:-2]
 
     # URL Construction
-    # https://pan.neokoni.ink/d/OneDrive-Public/lemonades/AviumUI/avium16/2025-12-08/AviumUI-16-lemonades-20251208-Unofficial-GMS.zip
+    # https://pan.neokoni.ink/d/NeoBuilds/lemonades/AviumUI/avium16/2025-12-08/AviumUI-16-lemonades-20251208-Unofficial-GMS.zip
     
     # Format date: 20251208 -> 2025-12-08
     if len(date_str) == 8:

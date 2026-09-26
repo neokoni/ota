@@ -37,7 +37,7 @@ python3 scripts/generate_ota_json.py \
 | `--version` | 覆盖版本标识（用于 URL 和 JSON 中） | `--version=avium16` |
 | `--os` | 覆盖 ROM 名称 | `--os=AviumUI` |
 | `--date` | 覆盖日期（YYYY-MM-DD 或 YYYYMMDD 格式） | `--date=2026-02-26` |
-| `--base-url` | 覆盖下载基础 URL（默认：`https://pan.neokoni.ink/d/OneDrive-Public`） | `--base-url=https://example.com/dl` |
+| `--base-url` | 覆盖下载基础 URL（默认：`https://pan.neokoni.ink/d/NeoBuilds`） | `--base-url=https://example.com/dl` |
 | `-y, --yes` | 跳过确认对话，直接保存文件 | `generate_ota_json.py rom.zip build.prop -y` |
 | `-n, --no` | 仅生成预览，不保存文件 | `generate_ota_json.py rom.zip build.prop -n` |
 
@@ -104,7 +104,7 @@ JSON Content Preview:
       "filename": "abc-1.2.3-device-20260226-Unofficial-GMS.zip",
       "id": "618bedfd390a3031da6bd063ac21d6d68b2e2faf",
       "size": 2590263421,
-      "url": "https://pan.neokoni.ink/d/OneDrive-Public/device/abc1/2026-02-26/...",
+      "url": "https://pan.neokoni.ink/d/NeoBuilds/device/abc1/2026-02-26/...",
       "version": "abc-1.2.3-device"
     }
   ]
