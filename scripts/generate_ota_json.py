@@ -8,15 +8,20 @@ import argparse
 # Default Configuration
 DEFAULT_BASE_URL = "https://pan.neokoni.ink/d/NeoBuilds"
 
-def get_sha1(file_path):
-    sha1 = hashlib.sha1()
+def get_sha(sha_algo, file_path):
+    if sha_algo.upper() == "SHA1":
+        algo = hashlib.sha1()
+    elif sha_algo.upper() == "SHA256":
+        algo = hashlib.sha256()
+    else:
+        raise ValueError(f"Unsupported SHA algorithm: {sha_algo}")
     with open(file_path, 'rb') as f:
         while True:
             data = f.read(65536)
             if not data:
                 break
-            sha1.update(data)
-    return sha1.hexdigest()
+            algo.update(data)
+    return algo.hexdigest()
 
 def parse_prop(prop_path):
     props = {}
@@ -35,23 +40,30 @@ def truncate_version_at_dot(version_str):
     match = re.match(r'^([^.]+)', version_str)
     return match.group(1) if match else version_str
 
+def exit_with_error(msg):
+    if msg:
+        print(f"Error: {msg}")
+    sys.exit(1)
+
 def main():
     parser = argparse.ArgumentParser(description="Generate OTA JSON from zip and prop files.")
     parser.add_argument("files", nargs='+', help="Path to .zip and .prop files")
-    parser.add_argument("--version", help="Override version (e.g. avium16)")
-    parser.add_argument("--os", help="Override OS name (e.g. AviumUI)")
+    parser.add_argument("--version", help="Override version (e.g. version-17)")
+    parser.add_argument("--os-version", help="Override OS version (e.g. 1.2.3)")
+    parser.add_argument("--os", help="Override OS name (e.g. ExampleUI)")
     parser.add_argument("--device", help="Override device codename (e.g. lemonades)")
     parser.add_argument("--date", help="Override date (e.g. 2026-02-26)")
     parser.add_argument("--base-url", default=DEFAULT_BASE_URL, help="Override base URL")
+    parser.add_argument("--format", default="2", help="OTA format data version (default: 2), from Android 17, use 2 for new format")
     parser.add_argument("-y", "--yes", action="store_true", help="Skip confirmation and save directly")
     parser.add_argument("-n", "--no", action="store_true", help="Skip saving, only generate preview")
+    parser.add_argument("-t", "--type", default="UNOFFICIAL", help="OTA type (default: UNOFFICIAL)")
     
     args = parser.parse_args()
 
     if len(args.files) != 2:
         print("Usage: python3 generate_ota_json.py <file1> <file2> [options]")
-        print("One must be a .zip file, the other a build.prop file")
-        sys.exit(1)
+        exit_with_error("One must be a .zip file, the other a build.prop file")
 
     file1 = args.files[0]
     file2 = args.files[1]
@@ -71,20 +83,16 @@ def main():
         prop_path = file2
 
     if not zip_path or not prop_path:
-        print("Error: Could not identify zip and prop files. Ensure one ends with .zip and the other is a .prop file.")
-        sys.exit(1)
+        exit_with_error("Could not identify zip and prop files. Ensure one ends with .zip and the other is a .prop file.")
 
     # Handle relative paths
     zip_path = os.path.abspath(zip_path)
     prop_path = os.path.abspath(prop_path)
 
     if not os.path.exists(zip_path):
-        print(f"Error: Zip file not found: {zip_path}")
-        sys.exit(1)
+        exit_with_error(f"Zip file not found: {zip_path}")
     if not os.path.exists(prop_path):
-        print(f"Error: Prop file not found: {prop_path}")
-        sys.exit(1)
-
+        exit_with_error(f"Prop file not found: {prop_path}")
     print(f"Processing Zip: {zip_path}")
     print(f"Processing Prop: {prop_path}")
 
@@ -92,19 +100,28 @@ def main():
     print("Step 1: Reading build.prop...")
     props = parse_prop(prop_path)
     utc_time = props.get('ro.system.build.date.utc')
+    if args.format == "2":
+        security_path = props.get('ro.build.version.security_patch')
+        sdk = props.get('ro.build.version.sdk')
     if not utc_time:
-        print("Error: ro.system.build.date.utc not found in build.prop")
-        sys.exit(1)
+        exit_with_error("Error: ro.system.build.date.utc not found in build.prop")
     print(f"  Found timestamp: {utc_time}")
 
     # 2. Get file info (size and SHA1)
     print("Step 2: Analyzing Zip file...")
     file_size = os.path.getsize(zip_path)
     print(f"  File size: {file_size} bytes")
+
+    if args.format == "2":
+        sha_algo = "SHA256"
+    elif args.format == "1":
+        sha_algo = "SHA1"
+    else:
+        exit_with_error(f"Unsupported OTA version: {args.format}")
     
-    print("  Calculating SHA1 (this may take a moment)...")
-    file_id = get_sha1(zip_path)
-    print(f"  SHA1: {file_id}")
+    print(f"  Calculating {sha_algo} (this may take a moment)...")
+    file_id = get_sha(sha_algo, zip_path)
+    print(f"  {sha_algo}: {file_id}")
 
     # 3. Parse filename
     print("Step 3: Parsing filename...")
@@ -112,7 +129,7 @@ def main():
     filename_no_ext = os.path.splitext(zip_filename)[0]
     
     # Expected format: Name-Ver-Device-Date-Tags.zip
-    # Example: AviumUI-16-lemonades-20251208-Unofficial-GMS.zip
+    # Example: ExampleUI-lemonades-20251208-Unofficial-GMS.zip
     parts = filename_no_ext.split('-')
     
     # Find date part (8 digits)
@@ -125,8 +142,7 @@ def main():
             break
     
     if date_index == -1 and not args.date:
-        print("Error: Date (YYYYMMDD) not found in filename.")
-        sys.exit(1)
+        exit_with_error("Date (YYYYMMDD) not found in filename and no --date argument provided.")
     elif args.date:
         # If date provided via args, handle it
         # Assuming args.date is YYYY-MM-DD or YYYYMMDD
@@ -158,7 +174,7 @@ def main():
     if args.version:
         version_str = args.version
         # Try to update parts derived from version
-        # If version is "avium16", we might want to split or just use it
+        # If version is "version-17", we might want to split or just use it
         # The original code did: url_ver_part = f"{rom_name_normalized}{rom_ver}"
         # detailed parsing logic below needs adjustment to support overrides properly
 
@@ -170,13 +186,13 @@ def main():
 
     # Recalculate derived values based on potential overrides
     
-    # Normalize ROM name (e.g. AviumUI -> avium)
+    # Normalize ROM name (e.g. ExampleUI -> example)
     rom_name_normalized = rom_name.lower()
     if rom_name_normalized.endswith('ui'):
         rom_name_normalized = rom_name_normalized[:-2]
 
     # URL Construction
-    # https://pan.neokoni.ink/d/NeoBuilds/lemonades/AviumUI/avium16/2025-12-08/AviumUI-16-lemonades-20251208-Unofficial-GMS.zip
+    # https://pan.neokoni.ink/d/NeoBuilds/lemonades/ExampleUI/version-17/2025-12-08/ExampleUI-16-lemonades-20251208-Unofficial-GMS.zip
     
     # Format date: 20251208 -> 2025-12-08
     if len(date_str) == 8:
@@ -184,44 +200,59 @@ def main():
     else:
         date_formatted = date_str # assume already formatted or handle error?
 
-    # URL Version part: avium-16
-    if args.version:
-        url_ver_part = args.version
-    else:
-        url_ver_part = f"{rom_name_normalized}-{rom_ver}"
-
     # Re-evaluate device codename if needed (not passed in args currently, maybe add?)
     # User didn't ask for device override, so keep from filename
     # Apply version truncation to path_ver_part as well (will be set in next block)
     
-    url = f"{args.base_url}/{device_codename}/{rom_name}/{url_ver_part}/{date_formatted}/{zip_filename}"
+    url = f"{args.base_url}/{device_codename}/{rom_name}/{args.version}/{date_formatted}/{zip_filename}"
     
     print(f"  Parsed Device: {device_codename}")
     print(f"  Parsed Version: {version_str}")
     print(f"  Generated URL: {url}")
 
     # 4. Build JSON
-    ota_data = {
-        "response": [
+    if args.format == "1":
+        ota_data = {
+            "response": [
+                {
+                    "datetime": int(utc_time),
+                    "filename": zip_filename, # Full filename with extension
+                    "id": file_id,
+                    "size": file_size,
+                    "url": url,
+                    "version": version_str
+                }
+            ]
+        }
+    elif args.format == "2" :
+        ota_data = [
             {
                 "datetime": int(utc_time),
-                "filename": zip_filename, # Full filename with extension
-                "id": file_id,
-                "size": file_size,
-                "url": url,
-                "version": version_str
+                "type": args.type,
+                "version": args.os_version if args.os_version else version_str,
+                "files": [
+                    {
+                       "filename": zip_filename,
+                       "size": file_size,
+                       "sha256": file_id,
+                       "url": url,
+                       "os_sdk_level": sdk,
+                       "os_patch_level": security_path
+                    }
+                ]
             }
         ]
-    }
+    else:
+        exit_with_error(f"Unsupported OTA version: {args.format}")
 
     # 5. Determine output path
-    # public/AviumUI/avium-16/lemonades/ota.json
-    # Path version part: avium-16 (lowercase name + - + version)
+    # public/OS/version/lemonades/ota.json
+    # Path version part: version-17 (lowercase name + - + version)
     
     if args.version:
         path_ver_part = args.version
     else:
-        path_ver_part = f"{rom_name_normalized}-{rom_ver}" # avium-16
+        path_ver_part = f"{rom_name_normalized}-{rom_ver}"
     
     # Project root is parent of script dir
     script_dir = os.path.dirname(os.path.realpath(__file__))
