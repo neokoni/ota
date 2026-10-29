@@ -4,6 +4,7 @@ import json
 import hashlib
 import re
 import argparse
+import zipfile
 
 # Default Configuration
 DEFAULT_BASE_URL = "https://pan.neokoni.ink/d/NeoBuilds"
@@ -45,6 +46,18 @@ def exit_with_error(msg):
         print(f"Error: {msg}")
     sys.exit(1)
 
+def get_streaming_properties(zip_path):
+    try:
+        ota_zip = zipfile.ZipFile(zip_path, 'r')
+        metadata = ota_zip.read('META-INF/com/android/metadata').decode('utf-8')
+        for line in metadata.splitlines():
+            k,v = line.split('=', 1)
+            if k == "ota-property-files":
+                return v.strip()
+        return None
+    except Exception:
+        return None
+
 def main():
     parser = argparse.ArgumentParser(description="Generate OTA JSON from zip and prop files.")
     parser.add_argument("files", nargs='+', help="Path to .zip and .prop files")
@@ -55,6 +68,7 @@ def main():
     parser.add_argument("--date", help="Override date (e.g. 2026-02-26)")
     parser.add_argument("--base-url", default=DEFAULT_BASE_URL, help="Override base URL")
     parser.add_argument("--format", default="2", help="OTA format data version (default: 2), from Android 17, use 2 for new format")
+    parser.add_argument("--no-stream", action="store_true", help="Disable try to add streaming install properties")
     parser.add_argument("-y", "--yes", action="store_true", help="Skip confirmation and save directly")
     parser.add_argument("-n", "--no", action="store_true", help="Skip saving, only generate preview")
     parser.add_argument("-t", "--type", default="UNOFFICIAL", help="OTA type (default: UNOFFICIAL)")
@@ -210,6 +224,14 @@ def main():
     
     output_rel_path = os.path.join("public", args.os, args.version, args.device, "ota.json")
     output_abs_path = os.path.join(project_root, output_rel_path)
+
+    if not args.no_stream:
+        if args.format == "2":
+            streaming_properties = get_streaming_properties(zip_path)
+            if streaming_properties:
+                ota_data[0]["files"][0]["ota_property_files"] = streaming_properties
+
+
 
     print("\n" + "="*30)
     print("JSON Content Preview:")
