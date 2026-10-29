@@ -149,47 +149,6 @@ def main():
         date_str = args.date.replace('-', '')
         # If we didn't find it in filename, we can't easily deduce index for version/device split
         # but we can try to proceed if we have overrides or if we found it but want to override
-    
-    # Extract info
-    # Version string: content before date
-    if date_index != -1:
-        version_str = "-".join(parts[:date_index])
-        device_codename = parts[date_index - 1]
-        rom_name = parts[0]
-        try:
-            rom_ver = parts[1] # Simple assumption based on example
-            # Truncate version at first dot (e.g. 16.2.0 -> 16)
-            rom_ver = truncate_version_at_dot(rom_ver)
-        except IndexError:
-             rom_ver = "unknown"
-    else:
-        # Fallback if date not in filename but passed via args
-        # We need to guess or rely on args
-        version_str = "Unknown"
-        device_codename = "Unknown"
-        rom_name = "Unknown"
-        rom_ver = "Unknown"
-
-    # Overrides
-    if args.version:
-        version_str = args.version
-        # Try to update parts derived from version
-        # If version is "version-17", we might want to split or just use it
-        # The original code did: url_ver_part = f"{rom_name_normalized}{rom_ver}"
-        # detailed parsing logic below needs adjustment to support overrides properly
-
-    if args.os:
-        rom_name = args.os
-
-    if args.device:
-        device_codename = args.device
-
-    # Recalculate derived values based on potential overrides
-    
-    # Normalize ROM name (e.g. ExampleUI -> example)
-    rom_name_normalized = rom_name.lower()
-    if rom_name_normalized.endswith('ui'):
-        rom_name_normalized = rom_name_normalized[:-2]
 
     # URL Construction
     # https://pan.neokoni.ink/d/NeoBuilds/lemonades/ExampleUI/version-17/2025-12-08/ExampleUI-16-lemonades-20251208-Unofficial-GMS.zip
@@ -204,10 +163,10 @@ def main():
     # User didn't ask for device override, so keep from filename
     # Apply version truncation to path_ver_part as well (will be set in next block)
     
-    url = f"{args.base_url}/{device_codename}/{rom_name}/{args.version}/{date_formatted}/{zip_filename}"
+    url = f"{args.base_url}/{args.device}/{args.os}/{args.version}/{date_formatted}/{zip_filename}"
     
-    print(f"  Parsed Device: {device_codename}")
-    print(f"  Parsed Version: {version_str}")
+    print(f"  Parsed Device: {args.device}")
+    print(f"  Parsed Version: {args.version}")
     print(f"  Generated URL: {url}")
 
     # 4. Build JSON
@@ -220,7 +179,7 @@ def main():
                     "id": file_id,
                     "size": file_size,
                     "url": url,
-                    "version": version_str
+                    "version": args.version
                 }
             ]
         }
@@ -229,7 +188,7 @@ def main():
             {
                 "datetime": int(utc_time),
                 "type": args.type,
-                "version": args.os_version if args.os_version else version_str,
+                "version": args.os_version if args.os_version else args.version,
                 "files": [
                     {
                        "filename": zip_filename,
@@ -245,20 +204,11 @@ def main():
     else:
         exit_with_error(f"Unsupported OTA version: {args.format}")
 
-    # 5. Determine output path
-    # public/OS/version/lemonades/ota.json
-    # Path version part: version-17 (lowercase name + - + version)
-    
-    if args.version:
-        path_ver_part = args.version
-    else:
-        path_ver_part = f"{rom_name_normalized}-{rom_ver}"
-    
-    # Project root is parent of script dir
+     # Project root is parent of script dir
     script_dir = os.path.dirname(os.path.realpath(__file__))
     project_root = os.path.dirname(script_dir)
     
-    output_rel_path = os.path.join("public", rom_name, path_ver_part, device_codename, "ota.json")
+    output_rel_path = os.path.join("public", args.os, args.version, args.device, "ota.json")
     output_abs_path = os.path.join(project_root, output_rel_path)
 
     print("\n" + "="*30)
