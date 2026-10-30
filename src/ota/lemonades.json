@@ -6,6 +6,28 @@
       "name": "uwuAOSP",
       "versions": [
         {
+          "version": "uwu-17",
+          "label": "类原生 uwuAOSP 17",
+          "otaUrl": "/uwuAOSP/uwu-17/lemonades/ota.json",
+          "releases": [
+            {
+              "date": "2026-10-31",
+              "changes": [
+                "上游代码:",
+                "初始构建: 更新至uwuAOSP 17.0.180",
+                "设备树:",
+                "1. 重构vibrator hal, 理论上改进了震动体验",
+                "2. KernelSU驱动改为BakaSU(rooted_boot)",
+                "3. 初始适配Android 17的LHDC支持",
+                "4. 从OxygenOS 14.0.0.2401(EX01)更新了部分blobs",
+                "5. 加入LineageOS的OPlus Legacy Face人脸解锁支持",
+                "6. 调整了状态栏显示区域的参数",
+                "7. 合并上游内核更改"
+              ]
+            }
+          ]
+        },
+        {
           "version": "uwu-16",
           "label": "类原生 uwuAOSP 16",
           "otaUrl": "/uwuAOSP/uwu-16/lemonades/ota.json",

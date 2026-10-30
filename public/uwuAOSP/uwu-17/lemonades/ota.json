@@ -1,0 +1,17 @@
+[
+  {
+    "datetime": 1793059200,
+    "type": "UNOFFICIAL",
+    "version": "17.0.180",
+    "files": [
+      {
+        "filename": "uwuAOSP-example-ota.zip",
+        "size": 2147483648,
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "url": "https://ota.example.org/files/uwuAOSP-example-ota.zip",
+        "os_sdk_level": 36,
+        "os_patch_level": "2026-10-05"
+      }
+    ]
+  }
+]
