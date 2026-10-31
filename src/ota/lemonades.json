@@ -14,7 +14,7 @@
               "date": "2026-10-31",
               "changes": [
                 "上游代码:",
-                "初始构建: 更新至uwuAOSP 17.0.180",
+                "初始构建: 更新至uwuAOSP 17.0.181",
                 "设备树:",
                 "1. 重构vibrator hal, 理论上改进了震动体验",
                 "2. KernelSU驱动改为BakaSU(rooted_boot)",

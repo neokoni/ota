@@ -1,16 +1,17 @@
 [
   {
-    "datetime": 1793059200,
+    "datetime": 1793407715,
     "type": "UNOFFICIAL",
-    "version": "17.0.180",
+    "version": "17.0.181",
     "files": [
       {
-        "filename": "uwuAOSP-example-ota.zip",
-        "size": 2147483648,
-        "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-        "url": "https://ota.example.org/files/uwuAOSP-example-ota.zip",
-        "os_sdk_level": 36,
-        "os_patch_level": "2026-10-05"
+        "filename": "uwuAOSP-17.0.181-20261031-UNOFFICIAL-lemonades-signed.zip",
+        "size": 2714810343,
+        "sha256": "5cf25f1f8bb6d1466f4154317c6277a98d6e7cfd024b4670b519eeb84afae20c",
+        "url": "https://pan.neokoni.ink/d/NeoBuilds/lemonades/uwuAOSP/uwu-17/2026-10-31/uwuAOSP-17.0.181-20261031-UNOFFICIAL-lemonades-signed.zip",
+        "os_sdk_level": "37",
+        "os_patch_level": "2026-10-01",
+        "ota_property_files": "payload_metadata.bin:4303:189488,payload.bin:4303:2714802602,payload_properties.txt:2714806963:156,apex_info.pb:2065:1448,care_map.pb:3560:696,metadata:69:692,metadata.pb:829:1188"
       }
     ]
   }
