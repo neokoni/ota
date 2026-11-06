@@ -1,34 +1,36 @@
 <template>
   <div class="system-view">
-    <div class="md-card system-card">
-      <div class="card-content">
-        <div class="header">
-          <md-icon-button @click="$router.back()">
-            <md-icon>arrow_back</md-icon>
-          </md-icon-button>
-          <h1>{{ systemName }} for {{ deviceName }}</h1>
-        </div>
-        <p>选择一个版本以查看更新日志。</p>
-
-        <div class="version-list">
-          <div
-            v-for="version in versions"
-            :key="version.version"
-            class="md-card version-item"
-            role="button"
-            tabindex="0"
-            @click="selectVersion(version.version)"
-            @keydown.enter="selectVersion(version.version)"
-          >
-            <md-ripple></md-ripple>
-            <div class="version-info">
-              <h3>{{ version.version }}</h3>
-              <p>{{ version.label }}</p>
-            </div>
-            <md-icon class="chevron-icon">chevron_right</md-icon>
+    <m3e-card variant="filled" class="hero-card">
+      <div slot="content">
+        <div class="hero-content">
+          <m3e-icon-button aria-label="返回设备" @click="router.back()">
+            <m3e-icon name="arrow_back"></m3e-icon>
+          </m3e-icon-button>
+          <div class="hero-heading">
+            <m3e-heading variant="headline" size="small" level="1">{{ systemName }}</m3e-heading>
+            <span class="subtitle">{{ deviceName }}</span>
           </div>
         </div>
+        <p class="hero-hint">选择一个版本以查看更新日志。</p>
       </div>
+    </m3e-card>
+
+    <m3e-action-list variant="segmented" class="version-list" aria-label="版本列表">
+      <m3e-list-action
+        v-for="version in versions"
+        :key="version.version"
+        @click="selectVersion(version.version)"
+      >
+        <m3e-icon slot="leading" name="history"></m3e-icon>
+        {{ version.version }}
+        <span slot="supporting-text">{{ version.label }}</span>
+        <m3e-icon slot="trailing" name="chevron_right"></m3e-icon>
+      </m3e-list-action>
+    </m3e-action-list>
+
+    <div v-if="!versions.length" class="empty-state">
+      <m3e-icon name="history"></m3e-icon>
+      <p>该设备暂未配置任何版本。</p>
     </div>
   </div>
 </template>
@@ -50,96 +52,54 @@ const system = computed(() => getSystem(codename.value, systemName.value));
 const versions = computed(() => system.value?.versions || []);
 
 function selectVersion(version: string) {
-  router.push(`/device/${codename.value}/${systemName.value}/${version}`);
+  void router.push(`/device/${codename.value}/${systemName.value}/${version}`);
 }
 </script>
 
 <style scoped>
 .system-view {
-  padding: 20px;
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.system-card {
-  padding: 24px;
-  width: 100%;
-  box-sizing: border-box;
-  background-color: var(--md-sys-color-surface-container-low);
-  border-radius: 16px;
-  border: 1px solid var(--md-sys-color-outline-variant);
-}
-
-.header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-
-.header h1 {
-  margin: 0;
-  font-size: 1.5rem;
-  color: var(--md-sys-color-on-surface);
-}
-
-.system-card > .card-content > p {
-  color: var(--md-sys-color-on-surface-variant);
-  margin: 0 0 16px 0;
-}
-
-.version-list {
-  margin-top: 20px;
   display: flex;
   flex-direction: column;
+  gap: 24px;
+  padding-top: 8px;
+}
+
+.hero-content {
+  display: flex;
+  align-items: center;
   gap: 12px;
 }
 
-.version-item {
-  position: relative;
-  overflow: hidden;
-  padding: 16px;
+.hero-heading {
   display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.subtitle {
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.hero-hint {
+  margin-top: 12px;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.version-list {
+  --m3e-segmented-list-item-container-color: var(--md-sys-color-surface-container-high);
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
-  border-radius: 12px;
-  background-color: var(--md-sys-color-surface-container-highest);
-  border: 1px solid var(--md-sys-color-outline-variant);
-  transition: background-color 200ms ease;
-  outline: none;
+  gap: 12px;
+  padding: 48px 16px;
+  color: var(--md-sys-color-on-surface-variant);
+  --m3e-icon-size: 40px;
 }
 
-.version-item:hover {
-  background-color: var(--md-sys-color-surface-variant);
-}
-
-.version-item:focus-visible {
-  outline: 3px solid var(--md-sys-color-primary);
-  outline-offset: 2px;
-}
-
-.version-info h3 {
-  margin: 0 0 4px 0;
-  color: var(--md-sys-color-on-surface);
-}
-
-.version-info p {
+.empty-state p {
   margin: 0;
-  color: var(--md-sys-color-on-surface-variant);
-}
-
-.chevron-icon {
-  color: var(--md-sys-color-on-surface-variant);
-}
-
-@media (max-width: 600px) {
-  .system-view {
-    padding: 12px;
-  }
-
-  .system-card {
-    padding: 16px;
-  }
 }
 </style>

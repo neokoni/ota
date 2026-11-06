@@ -1,4 +1,4 @@
-# Neokoni's OTA Center — 文档
+# NeoBuilds Changelog — 文档
 
 本目录包含 **ota_site** 项目的完整技术文档。
 
@@ -15,7 +15,7 @@
 
 ## 项目简介
 
-**ota_site** 是一个自托管的 OTA（空中升级）信息站点，用于展示 Neokoni ROM 构建的更新记录。用户可以在此站点：
+**ota_site** 用于展示 Neokoni ROM 的更新记录。用户可以在此站点：
 
 - 浏览所有受支持的设备列表
 - 查看每台设备上可用的 ROM 系统及版本
@@ -26,6 +26,6 @@
 
 - **前端框架**：[Vue 3](https://vuejs.org/) + TypeScript
 - **构建工具**：[Vite](https://vite.dev/)
-- **UI 组件库**：[@material/web 2](https://github.com/material-components/material-web)（Material Web Components，Google 官方 Material Design 3）
+- **UI 组件库**：[@m3e/web](https://github.com/matraic/m3e)（Material 3 Expressive Web Components）
 - **路由**：[Vue Router 4](https://router.vuejs.org/)
 - **CI/CD**：GitHub Actions + SSH 部署

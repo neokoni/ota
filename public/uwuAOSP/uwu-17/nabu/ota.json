@@ -1,0 +1,18 @@
+[
+  {
+    "datetime": 1793417917,
+    "type": "UNOFFICIAL",
+    "version": "17.0.181",
+    "files": [
+      {
+        "filename": "uwuAOSP-17.0.181-20261031-UNOFFICIAL-nabu-signed.zip",
+        "size": 2651888456,
+        "sha256": "d4f63b3a8ad2af761519165f8ddea00d1dd2897effecb2c4ffaff458cfc3c83f",
+        "url": "https://pan.neokoni.ink/d/NeoBuilds/nabu/uwuAOSP/uwu-17/2026-10-31/uwuAOSP-17.0.181-20261031-UNOFFICIAL-nabu-signed.zip",
+        "os_sdk_level": "37",
+        "os_patch_level": "2026-10-01",
+        "ota_property_files": "payload_metadata.bin:4164:182712,payload.bin:4164:2651880854,payload_properties.txt:2651885076:156,apex_info.pb:1972:1445,care_map.pb:3464:653,metadata:69:680,metadata.pb:817:1107"
+      }
+    ]
+  }
+]

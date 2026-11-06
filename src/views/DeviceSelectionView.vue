@@ -1,41 +1,61 @@
 <template>
   <div class="device-selection-view">
-    <h1 class="page-title">选择您的设备</h1>
+    <header class="page-header">
+      <m3e-heading variant="headline" size="medium" level="1">选择您的设备</m3e-heading>
+      <p>选择设备代号以查看可用的系统版本。</p>
+    </header>
+
     <div class="device-grid">
-      <div
+      <m3e-card
         v-for="device in devices"
         :key="device.codename"
-        class="device-card md-card"
-        @click="$router.push(`/device/${device.codename}`)"
+        variant="filled"
+        actionable
         role="button"
         tabindex="0"
-        @keydown.enter="$router.push(`/device/${device.codename}`)"
+        class="device-card"
+        @click="openDevice(device.codename)"
+        @keydown.enter.prevent="openDevice(device.codename)"
+        @keydown.space.prevent="openDevice(device.codename)"
       >
-        <md-ripple></md-ripple>
-        <div class="device-info">
-          <h3>{{ device.name }}</h3>
-          <p>{{ device.codename }}</p>
+        <div slot="content" class="device-content">
+          <span class="device-icon">
+            <m3e-icon name="devices"></m3e-icon>
+          </span>
+          <div class="device-meta">
+            <m3e-heading variant="title" size="medium">{{ device.name }}</m3e-heading>
+            <span class="device-codename">{{ device.codename }}</span>
+          </div>
+          <m3e-icon class="chevron" name="chevron_right"></m3e-icon>
         </div>
-        <md-icon class="chevron-icon">chevron_right</md-icon>
-      </div>
+      </m3e-card>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useRouter } from 'vue-router';
 import { devices } from '@/config/devices';
+
+const router = useRouter();
+
+function openDevice(codename: string) {
+  void router.push(`/device/${codename}`);
+}
 </script>
 
 <style scoped>
 .device-selection-view {
-  padding: 20px;
-  max-width: 800px;
-  margin: 0 auto;
+  padding-top: 8px;
 }
 
-.page-title {
+.page-header {
   margin-bottom: 24px;
-  color: var(--md-sys-color-on-surface);
+}
+
+.page-header p {
+  margin: 8px 0 0;
+  color: var(--md-sys-color-on-surface-variant);
 }
 
 .device-grid {
@@ -44,49 +64,49 @@ import { devices } from '@/config/devices';
   gap: 16px;
 }
 
+.device-card {
+  cursor: pointer;
+}
+
+.device-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.device-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 16px;
+  background-color: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+  --m3e-icon-size: 26px;
+}
+
+.device-meta {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.device-codename {
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.chevron {
+  color: var(--md-sys-color-on-surface-variant);
+}
+
 @media (max-width: 600px) {
   .device-grid {
     grid-template-columns: 1fr;
   }
-}
-
-.device-card {
-  position: relative;
-  overflow: hidden;
-  padding: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
-  border-radius: 12px;
-  background-color: var(--md-sys-color-surface-container-low);
-  border: 1px solid var(--md-sys-color-outline-variant);
-  transition: background-color 200ms ease;
-  outline: none;
-}
-
-.device-card:hover {
-  background-color: var(--md-sys-color-surface-container);
-}
-
-.device-card:focus-visible {
-  outline: 3px solid var(--md-sys-color-primary);
-  outline-offset: 2px;
-}
-
-.device-info h3 {
-  margin: 0 0 4px 0;
-  font-size: 1.2rem;
-  color: var(--md-sys-color-on-surface);
-}
-
-.device-info p {
-  margin: 0;
-  color: var(--md-sys-color-on-surface-variant);
-  font-family: monospace;
-}
-
-.chevron-icon {
-  color: var(--md-sys-color-on-surface-variant);
 }
 </style>

@@ -6,6 +6,29 @@
       "name": "uwuAOSP",
       "versions": [
         {
+          "version": "uwu-17",
+          "label": "类原生 uwuAOSP 17",
+          "otaUrl": "/uwuAOSP/uwu-17/nabu/ota.json",
+          "releases": [
+            {
+              "date": "2026-10-31",
+              "changes": [
+                "上游代码:",
+                "初始构建: 更新至uwuAOSP 17.0.181",
+                "设备树:",
+                "1. 移除了无用的Vibrator HAL",
+                "2. KernelSU驱动改为BakaSU(rooted_boot)",
+                "3. 初始适配Android 17的LHDC支持",
+                "4. 从OS1.0.18.0.TKXINXM更新了部分blobs",
+                "5. 改用原生双击亮屏实现",
+                "6. 移除翻盖唤醒设置项, 现在为始终启用",
+                "7. 重构小米键盘保护套的支持, 现在可以自动识别并连接",
+                "8. 合并上游内核更改"
+              ]
+            }
+          ]
+        },
+        {
           "version": "uwu-16",
           "label": "类原生 uwuAOSP 16",
           "otaUrl": "/uwuAOSP/uwu-16/nabu/ota.json",

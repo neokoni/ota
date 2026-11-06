@@ -1,41 +1,33 @@
 <template>
   <div class="not-found-view">
-    <div class="container">
-      <div class="illustration">
-        <img src="http://bili.apis.amethysty.dev/" alt="anime" class="anime-404" />
-      </div>
-      <div class="content">
-        <h1 class="title">404</h1>
-        <p class="description">
-          哎呀呀, 找不到了喵。
-        </p>
-        <md-filled-button @click="$router.push('/')">主页</md-filled-button>
-      </div>
+    <div class="illustration">
+      <img src="http://bili.apis.amethysty.dev/" alt="anime" class="anime-404" />
+    </div>
+    <div class="content">
+      <m3e-heading variant="display" size="large" level="1" class="title">404</m3e-heading>
+      <p class="description">哎呀呀, 找不到了喵。</p>
+      <m3e-button variant="filled" @click="router.push('/')">
+        主页
+        <m3e-icon slot="trailing-icon" name="home"></m3e-icon>
+      </m3e-button>
     </div>
   </div>
 </template>
 
+<script setup lang="ts">
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+</script>
+
 <style scoped>
 .not-found-view {
   display: flex;
+  align-items: center;
   justify-content: center;
-  align-items: center;
-  min-height: 80vh;
-  padding: 20px;
-}
-
-.anime-404 {
-  max-width: 30vw;
-  height: auto;
-}
-
-.container {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
   gap: 60px;
-  max-width: 1000px;
-  width: 100%;
+  min-height: 70vh;
+  padding: 24px 0;
 }
 
 .illustration {
@@ -44,24 +36,24 @@
   justify-content: flex-end;
 }
 
+.anime-404 {
+  max-width: 30vw;
+  height: auto;
+}
+
 .content {
   flex: 1;
-  text-align: left;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
 }
 
 .title {
-  font-size: 8rem;
-  font-weight: 700;
-  margin: 0;
-  line-height: 1;
   color: var(--md-sys-color-on-surface);
 }
 
 .description {
-  margin: 24px 0 32px;
+  margin: 16px 0 32px;
   font-size: 1.1rem;
   line-height: 1.6;
   color: var(--md-sys-color-on-surface-variant);
@@ -69,12 +61,12 @@
 }
 
 @media (max-width: 768px) {
-  .container {
+  .not-found-view {
     flex-direction: column;
-    text-align: center;
     gap: 32px;
+    text-align: center;
   }
-  
+
   .illustration {
     justify-content: center;
   }
@@ -82,14 +74,10 @@
   .anime-404 {
     max-width: 80vw;
   }
-  
+
   .content {
     align-items: center;
     text-align: center;
-  }
-
-  .title {
-    font-size: 6rem;
   }
 }
 </style>

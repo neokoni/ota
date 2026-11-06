@@ -1,49 +1,64 @@
 <template>
   <div class="changelog-view">
-    <div class="header-section">
-      <md-icon-button @click="$router.back()">
-        <md-icon>arrow_back</md-icon>
-      </md-icon-button>
-      <div>
-        <h1>{{ deviceName }}</h1>
-        <a v-if="otaUrl" :href="otaUrl" target="_blank" class="json-link">查看系统更新文件 (JSON)</a>
-        <p class="subtitle">{{ systemName }} - {{ versionName }}</p>
-      </div>
-    </div>
-
-    <div class="changelog-list">
-      <template v-if="changelogData">
-        <div
-          v-for="(release, index) in changelogData.releases"
-          :key="release.date"
-          class="changelog-card"
-          :class="index === 0 ? 'changelog-card--filled' : 'changelog-card--elevated'"
-        >
-          <div class="card-header">
-            <h3>{{ release.date }}</h3>
-            <md-filter-chip v-if="index === 0" label="最新" selected></md-filter-chip>
-          </div>
-          <md-divider></md-divider>
-          <div class="card-body">
-            <ul>
-              <li v-for="(change, idx) in release.changes" :key="idx" v-html="change"></li>
-            </ul>
+    <m3e-card variant="filled" class="hero-card">
+      <div slot="content">
+        <div class="hero-content">
+          <m3e-icon-button aria-label="返回版本列表" @click="router.back()">
+            <m3e-icon name="arrow_back"></m3e-icon>
+          </m3e-icon-button>
+          <div class="hero-heading">
+            <m3e-heading variant="headline" size="small" level="1">{{ deviceName }}</m3e-heading>
+            <span class="subtitle">{{ systemName }} · {{ versionName }}</span>
           </div>
         </div>
-      </template>
-      <div v-else class="state-container">
-        <p>未找到更新日志</p>
+        <div v-if="otaUrl" class="hero-actions">
+          <m3e-button
+            variant="tonal"
+            :href="otaUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            查看系统更新文件 (JSON)
+            <m3e-icon slot="trailing-icon" name="system_update_alt"></m3e-icon>
+          </m3e-button>
+        </div>
       </div>
+    </m3e-card>
+
+    <div v-if="changelogData" class="changelog-list">
+      <m3e-card
+        v-for="(release, index) in changelogData.releases"
+        :key="release.date"
+        :variant="index === 0 ? 'filled' : 'outlined'"
+        class="release-card"
+      >
+        <div slot="header" class="release-header">
+          <m3e-heading variant="title" size="medium">{{ release.date }}</m3e-heading>
+          <m3e-chip v-if="index === 0" variant="elevated">
+            <m3e-icon slot="icon" name="check_circle"></m3e-icon>
+            最新
+          </m3e-chip>
+        </div>
+        <ul slot="content" class="release-list">
+          <li v-for="(change, idx) in release.changes" :key="idx" v-html="change"></li>
+        </ul>
+      </m3e-card>
+    </div>
+
+    <div v-else class="empty-state">
+      <m3e-icon name="history"></m3e-icon>
+      <p>未找到更新日志</p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { getDevice, getSystem } from '@/config/devices';
 
 const route = useRoute();
+const router = useRouter();
 const codename = computed(() => route.params.codename as string);
 const systemName = computed(() => route.params.system as string);
 const versionName = computed(() => route.params.version as string);
@@ -66,108 +81,70 @@ const changelogData = computed(() => {
 
 <style scoped>
 .changelog-view {
-  padding: 20px;
-  max-width: 800px;
-  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-top: 8px;
 }
 
-.header-section {
+.hero-content {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 32px;
+  gap: 12px;
 }
 
-.header-section h1 {
-  margin: 0;
-  font-size: 1.75rem;
-  color: var(--md-sys-color-on-surface);
-}
-
-.json-link {
-  display: block;
-  font-size: 0.875rem;
-  color: var(--md-sys-color-primary);
-  text-decoration: none;
-  margin-top: 4px;
-}
-
-.json-link:hover {
-  text-decoration: underline;
+.hero-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .subtitle {
-  margin: 4px 0 0 0;
   color: var(--md-sys-color-on-surface-variant);
+}
+
+.hero-actions {
+  margin-top: 16px;
 }
 
 .changelog-list {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
 }
 
-.state-container {
+.release-header {
   display: flex;
-  justify-content: center;
-  padding: 40px;
-  color: var(--md-sys-color-on-surface-variant);
-}
-
-.changelog-card {
-  width: 100%;
-  border-radius: 16px;
-  overflow: hidden;
-}
-
-.changelog-card--filled {
-  background-color: var(--md-sys-color-primary-container);
-  border: 1px solid transparent;
-}
-
-.changelog-card--elevated {
-  background-color: var(--md-sys-color-surface-container-high);
-  border: 1px solid var(--md-sys-color-outline-variant);
-  box-shadow: var(--md-sys-elevation-level1, 0 1px 3px rgba(0,0,0,0.12));
-}
-
-.card-header {
-  padding: 16px 24px;
-  display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
-.card-header h3 {
-  margin: 0;
-  font-size: 1.1rem;
-  color: var(--md-sys-color-on-surface);
-}
-
-.changelog-card--filled .card-header h3 {
-  color: var(--md-sys-color-on-primary-container);
-}
-
-.card-body {
-  padding: 16px 24px;
-}
-
-.card-body ul {
+.release-list {
   margin: 0;
   padding-left: 20px;
+  line-height: 1.6;
 }
 
-.card-body li {
+.release-list li {
   margin-bottom: 8px;
-  line-height: 1.5;
-  color: var(--md-sys-color-on-surface);
 }
 
-.changelog-card--filled .card-body li {
-  color: var(--md-sys-color-on-primary-container);
-}
-
-.card-body li:last-child {
+.release-list li:last-child {
   margin-bottom: 0;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 48px 16px;
+  color: var(--md-sys-color-on-surface-variant);
+  --m3e-icon-size: 40px;
+}
+
+.empty-state p {
+  margin: 0;
 }
 </style>

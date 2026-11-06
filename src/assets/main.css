@@ -1,22 +1,11 @@
 :root {
   --font-family: 'Roboto', 'Noto Sans SC', sans-serif;
-  /* Make md-icon use the self-hosted Material Symbols Rounded variable font */
-  --md-icon-font: 'Material Symbols Rounded Variable';
+  --md-ref-typeface-plain: var(--font-family);
+  --md-ref-typeface-brand: var(--font-family);
 
-  /* MD3 baseline (purple) static fallbacks — overridden at runtime by applyTheme() */
-  --md-sys-color-primary: #6750a4;
-  --md-sys-color-secondary: #625b71;
-  --md-sys-color-surface: #fffbfe;
-  --md-sys-color-surface-dim: #ded8e1;
-  --md-sys-color-surface-bright: #fffbfe;
-  --md-sys-color-surface-container-lowest: #ffffff;
-  --md-sys-color-surface-container-low: #f7f2fa;
-  --md-sys-color-surface-container: #f3edf7;
-  --md-sys-color-surface-container-high: #ece6f0;
-  --md-sys-color-surface-container-highest: #e6e0e9;
-  --md-sys-color-on-surface: #1c1b1f;
-  --md-sys-color-on-surface-variant: #49454f;
-  --md-sys-color-outline-variant: #cac4d0;
+  /* Library default is 450ms/350ms; wide list rows read faster than the docs demos. */
+  --m3e-ripple-enter-duration: 1500ms;
+  --m3e-ripple-exit-duration: 500ms;
 }
 
 body {
@@ -25,8 +14,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
   margin: 0;
   overflow-x: hidden;
-  background-color: var(--md-sys-color-surface);
-  color: var(--md-sys-color-on-surface);
 }
 
 /* Override browser-default blue/purple link colors with theme tokens */
@@ -42,4 +29,43 @@ code { /* from https://developer.mozilla.org/zh-CN/docs/Web/HTML/Reference/Eleme
   background-color: color-mix(in srgb, var(--md-sys-color-on-surface-variant) 28%, transparent);
   border-radius: 3px;
   padding: 0 3px;
+}
+
+/* Keep hover/press feedback to state layers only — no elevation change. */
+m3e-button {
+  --m3e-filled-button-hover-container-elevation: 0;
+  --m3e-filled-button-focus-container-elevation: 0;
+  --m3e-filled-button-pressed-container-elevation: 0;
+  --m3e-tonal-button-hover-container-elevation: 0;
+  --m3e-tonal-button-focus-container-elevation: 0;
+  --m3e-tonal-button-pressed-container-elevation: 0;
+  --m3e-elevated-button-hover-container-elevation: 0;
+  --m3e-elevated-button-focus-container-elevation: 0;
+  --m3e-elevated-button-pressed-container-elevation: 0;
+  --m3e-outlined-button-hover-container-elevation: 0;
+  --m3e-outlined-button-focus-container-elevation: 0;
+  --m3e-outlined-button-pressed-container-elevation: 0;
+  --m3e-text-button-hover-container-elevation: 0;
+  --m3e-text-button-focus-container-elevation: 0;
+  --m3e-text-button-pressed-container-elevation: 0;
+}
+
+m3e-card {
+  --m3e-card-hover-container-elevation: 0;
+  --m3e-card-focus-container-elevation: 0;
+  --m3e-card-pressed-container-elevation: 0;
+  --m3e-filled-card-hover-container-elevation: 0;
+  --m3e-filled-card-focus-container-elevation: 0;
+  --m3e-filled-card-pressed-container-elevation: 0;
+  --m3e-elevated-card-hover-container-elevation: 0;
+  --m3e-elevated-card-focus-container-elevation: 0;
+  --m3e-elevated-card-pressed-container-elevation: 0;
+  --m3e-outlined-card-hover-container-elevation: 0;
+  --m3e-outlined-card-focus-container-elevation: 0;
+  --m3e-outlined-card-pressed-container-elevation: 0;
+}
+
+m3e-chip {
+  --m3e-elevated-chip-elevation: 0;
+  --m3e-elevated-chip-hover-elevation: 0;
 }

@@ -1,86 +1,82 @@
 <template>
-  <div class="app-layout">
-    <!-- Top App Bar -->
-    <header class="top-app-bar" :class="{ scrolled: isScrolled }">
-      <md-icon-button class="menu-btn" @click="drawerOpen = !drawerOpen">
-        <md-icon>menu</md-icon>
-      </md-icon-button>
-      <div class="app-bar-branding" @click="navigate('/')">
-        <img src="https://res.neokoni.ink/neokoni/svg/favicon.svg" class="app-bar-logo" alt="logo" />
-        <span class="app-bar-title">Neokoni's OTA Center</span>
-      </div>
-      <div class="spacer"></div>
-      <md-icon-button @click="toggleTheme" :title="themeLabel">
-        <md-icon>{{ themeIcon }}</md-icon>
-      </md-icon-button>
-    </header>
+  <div class="app-shell">
+    <m3e-app-bar class="top-app-bar">
+      <m3e-icon-button slot="leading" aria-label="切换导航抽屉" toggle>
+        <m3e-drawer-toggle for="nav-drawer"></m3e-drawer-toggle>
+        <m3e-icon name="menu"></m3e-icon>
+        <m3e-icon slot="selected" name="menu_open"></m3e-icon>
+      </m3e-icon-button>
 
-    <!-- Backdrop overlay for mobile drawer -->
-    <div class="drawer-backdrop" :class="{ visible: drawerOpen }" @click="drawerOpen = false"></div>
+      <span slot="title" class="brand" @click="navigate('/')">
+        <img class="brand-logo" src="https://res.neokoni.ink/neokoni/svg/favicon.svg" alt="" />
+        <span class="brand-name">NeoBuilds Changelog</span>
+      </span>
 
-    <!-- Body row: drawer + main content side by side (push layout, same layer) -->
-    <div class="body-row">
-      <!-- Navigation Drawer wrapper — animates width 0→280px to push content -->
-      <div class="drawer-wrapper" :class="{ open: drawerOpen }">
-        <nav class="navigation-drawer">
-          <md-list>
-            <div class="nav-item-wrap">
-              <md-list-item type="button" @click="navigate('/')">
-                <md-icon slot="start">home</md-icon>
-                主页
-              </md-list-item>
-            </div>
-            <md-divider></md-divider>
-            <div class="list-subheader">设备列表</div>
-            <div
-              v-for="device in devices"
-              :key="device.codename"
-              class="nav-item-wrap"
-            >
-              <md-list-item
-                type="button"
-                @click="navigate(`/device/${device.codename}`)"
-              >
-                <md-icon slot="start">smartphone</md-icon>
-                {{ device.name }} ({{ device.codename }})
-              </md-list-item>
-            </div>
-          </md-list>
-        </nav>
-      </div>
+      <m3e-icon-button slot="trailing" :title="themeLabel" :aria-label="themeLabel" @click="cycleThemeMode">
+        <m3e-icon :name="themeIcon"></m3e-icon>
+      </m3e-icon-button>
+    </m3e-app-bar>
 
-      <!-- Main Content -->
+    <m3e-drawer-container
+      class="drawer-container"
+      :start="drawerOpen"
+      start-mode="auto"
+      @change="syncDrawer"
+    >
+      <nav slot="start" id="nav-drawer" class="navigation-drawer" aria-label="站点导航">
+        <m3e-nav-rail mode="compact">
+          <m3e-nav-item
+            :selected="route.path === '/'"
+            @click="navigate('/')"
+          >
+            <m3e-icon slot="icon" name="home"></m3e-icon>
+            主页
+          </m3e-nav-item>
+          <m3e-nav-item
+            :selected="isDevicesSection"
+            @click="navigate('/devices')"
+          >
+            <m3e-icon slot="icon" name="devices"></m3e-icon>
+            设备列表
+          </m3e-nav-item>
+        </m3e-nav-rail>
+      </nav>
+
       <main class="layout-main">
         <div class="content-area">
-          <router-view></router-view>
+          <router-view v-slot="{ Component, route: currentRoute }">
+            <transition name="route" mode="out-in">
+              <component :is="Component" :key="currentRoute.path" />
+            </transition>
+          </router-view>
         </div>
 
         <footer class="site-footer">
-          <a v-for="(item, index) in siteConfig" :key="index" :href="item.icpLink" target="_blank" rel="noopener noreferrer">
-            {{ item.icp }}<br>
-          </a>
+          <a
+            v-for="item in siteConfig"
+            :key="item.icp"
+            :href="item.icpLink"
+            target="_blank"
+            rel="noopener noreferrer"
+          >{{ item.icp }}</a>
         </footer>
       </main>
-    </div>
+    </m3e-drawer-container>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { themeFromImage, themeFromSourceColor, applyTheme, DynamicScheme, Hct, SchemeTonalSpot, hexFromArgb } from '@material/material-color-utilities';
-import type { Theme } from '@material/material-color-utilities';
-import { devices } from '@/config/devices';
-import { siteConfig, wallpaperConfig } from '@/config/site';
+import { computed, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { siteConfig } from '@/config/site';
+import { cycleThemeMode, themeMode } from '@/config/theme';
 
-const drawerOpen = ref(false);
+const route = useRoute();
 const router = useRouter();
-const isScrolled = ref(false);
+const persistentDrawer = window.matchMedia('(min-width: 840px)');
+const drawerOpen = ref(persistentDrawer.matches);
 
-// Theme Logic
-type ThemeMode = 'auto' | 'light' | 'dark';
-const themeMode = ref<ThemeMode>('auto');
-let loadedTheme: Theme | null = null;
+const isDevicesSection = computed(() => route.path.startsWith('/device'));
 
 const themeIcon = computed(() => {
   switch (themeMode.value) {
@@ -98,252 +94,91 @@ const themeLabel = computed(() => {
   }
 });
 
-function isDarkMode(mode: ThemeMode): boolean {
-  return mode === 'dark' || (mode === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-}
-
-function applyCurrentTheme(theme: Theme, mode: ThemeMode) {
-  applyTheme(theme, { dark: isDarkMode(mode), brightnessSuffix: true });
-  document.body.classList.toggle('dark', isDarkMode(mode));
-  setExtraTokens(theme, isDarkMode(mode));
-}
-
-function setExtraTokens(theme: Theme, dark: boolean) {
-  const scheme = new SchemeTonalSpot(Hct.fromInt(theme.source), dark, 0.0);
-  const extras: Record<string, number> = {
-    'surface-dim': scheme.surfaceDim,
-    'surface-bright': scheme.surfaceBright,
-    'surface-container-lowest': scheme.surfaceContainerLowest,
-    'surface-container-low': scheme.surfaceContainerLow,
-    'surface-container': scheme.surfaceContainer,
-    'surface-container-high': scheme.surfaceContainerHigh,
-    'surface-container-highest': scheme.surfaceContainerHighest,
-    'outline-variant': scheme.outlineVariant,
-  };
-  for (const [key, value] of Object.entries(extras)) {
-    const token = `--md-sys-color-${key}`;
-    const color = hexFromArgb(value);
-    document.body.style.setProperty(token, color);
-  }
-}
-
-let darkMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-
-function onMediaDarkChange() {
-  if (themeMode.value === 'auto' && loadedTheme) {
-    applyCurrentTheme(loadedTheme, themeMode.value);
-  }
-}
-
-function toggleTheme() {
-  if (themeMode.value === 'auto') themeMode.value = 'light';
-  else if (themeMode.value === 'light') themeMode.value = 'dark';
-  else themeMode.value = 'auto';
-
-  if (loadedTheme) {
-    applyCurrentTheme(loadedTheme, themeMode.value);
-  }
-  localStorage.setItem('theme-mode', themeMode.value);
-}
-
-async function initDynamicColors() {
-  if (!wallpaperConfig.api) return;
-
-  const timeout = 5 * 1000;
-  const img = new Image();
-  img.crossOrigin = 'Anonymous';
-
-  const loadPromise = new Promise<HTMLImageElement>((resolve, reject) => {
-    img.onload = () => resolve(img);
-    img.onerror = () => reject(new Error('Failed to load image'));
-    img.src = wallpaperConfig.api;
-  });
-
-  const timeoutPromise = new Promise<never>((_, reject) => {
-    setTimeout(() => reject(new Error('Timeout')), timeout);
-  });
-
-  try {
-    await Promise.race([loadPromise, timeoutPromise]);
-    loadedTheme = await themeFromImage(img);
-    applyCurrentTheme(loadedTheme, themeMode.value);
-    console.log('Dynamic color applied from wallpaper');
-  } catch (error) {
-    console.warn('Dynamic color initialization failed:', error);
-    // Apply MD3 baseline purple theme as fallback so surface tokens are defined
-    loadedTheme = themeFromSourceColor(0xFF6750A4);
-    applyCurrentTheme(loadedTheme, themeMode.value);
-  }
-}
-
-function handleScroll() {
-  isScrolled.value = window.scrollY > 4;
-}
-
-onMounted(() => {
-  const saved = localStorage.getItem('theme-mode') as ThemeMode;
-  if (saved && ['auto', 'light', 'dark'].includes(saved)) {
-    themeMode.value = saved;
-  }
-
-  darkMediaQuery.addEventListener('change', onMediaDarkChange);
-  window.addEventListener('scroll', handleScroll);
-  initDynamicColors();
-});
-
-onUnmounted(() => {
-  darkMediaQuery.removeEventListener('change', onMediaDarkChange);
-  window.removeEventListener('scroll', handleScroll);
-});
-
 function navigate(path: string) {
-  router.push(path);
+  if (!persistentDrawer.matches) drawerOpen.value = false;
+  if (route.path !== path) void router.push(path);
+}
+
+function syncDrawer(event: Event) {
+  const container = event.currentTarget as HTMLElement & { start: boolean };
+  drawerOpen.value = container.start;
 }
 </script>
 
 <style scoped>
-/* App Layout */
-.app-layout {
+.app-shell {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: 100dvh;
 }
 
-/* Top App Bar */
 .top-app-bar {
   position: sticky;
   top: 0;
   z-index: 100;
-  display: flex;
-  align-items: center;
-  height: 64px;
-  padding: 0 24px;
-  background-color: var(--md-sys-color-surface);
-  transition: box-shadow 200ms ease, background-color 200ms ease;
+  --m3e-app-bar-container-color: var(--md-sys-color-surface);
 }
 
-.top-app-bar.scrolled {
-  background-color: var(--md-sys-color-surface-container);
-  box-shadow: var(--md-sys-elevation-level2, 0 3px 6px rgba(0,0,0,0.12));
-}
-
-.app-bar-branding {
-  display: flex;
+.brand {
+  display: inline-flex;
   align-items: center;
   gap: 12px;
-  cursor: pointer;
   padding: 4px 8px;
-  border-radius: 8px;
+  border-radius: 999px;
+  cursor: pointer;
   transition: background-color 200ms ease;
 }
 
-.app-bar-branding:hover {
+.brand:hover {
   background-color: color-mix(in srgb, var(--md-sys-color-on-surface) 8%, transparent);
 }
 
-.app-bar-logo {
-  width: 32px;
-  height: 32px;
+.brand-logo {
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
 }
 
-.app-bar-title {
-  font-size: 1.375rem;
-  font-weight: 400;
-  color: var(--md-sys-color-on-surface);
-  letter-spacing: 0;
-  font-family: var(--font-family);
-}
-
-.spacer {
-  flex: 1;
-}
-
-/* Body row: drawer + main sit side-by-side, same layer */
-.body-row {
-  display: flex;
-  flex: 1;
-}
-
-/* Drawer wrapper animates width 0 → 280px to push main content */
-.drawer-wrapper {
-  flex-shrink: 0;
-  align-self: stretch;
-  width: 0;
-  overflow: hidden;
-  transition: width 300ms cubic-bezier(0.2, 0, 0, 1);
-}
-
-.drawer-wrapper.open {
-  width: 280px;
-}
-
-/* Navigation Drawer — in-flow, solid background */
-.navigation-drawer {
-  width: 280px;
-  min-height: 100%;
-  background-color: var(--md-sys-color-surface-container-low);
-  border-radius: 0 16px 16px 0;
-  overflow-y: auto;
-  padding-top: 12px;
-  /* Transparent md-list background so drawer colour shows uniformly */
-  --md-list-container-color: transparent;
-}
-
-/* MD3 Navigation Drawer: pill-shaped (28 dp radius) item highlight, inset 12 px */
-.nav-item-wrap {
-  position: relative;
-  margin: 2px 12px;
-  border-radius: 28px;
-  transition: background 200ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.nav-item-wrap:hover {
-  background: color-mix(in srgb, var(--md-sys-color-on-surface) 8%, transparent);
-}
-
-.navigation-drawer :deep(md-list-item) {
-  border-radius: 28px;
-  /* Disable built-in flat-opacity hover layer; our .nav-item-wrap provides the hover styles */
-  --md-list-item-hover-state-layer-opacity: 0;
-  --md-list-item-leading-space: 16px;
-  --md-list-item-trailing-space: 16px;
-}
-
-.list-subheader {
-  padding: 8px 16px 4px;
-  font-size: 0.75rem;
+.brand-name {
   font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--md-sys-color-on-surface-variant);
 }
 
-/* Give the divider some breathing room and use the outline-variant token */
-.navigation-drawer :deep(md-divider) {
-  margin: 8px 0;
-  --md-divider-color: var(--md-sys-color-outline-variant);
-}
-
-/* Main Layout */
-.layout-main {
+.drawer-container {
   flex: 1;
-  min-width: 0;
+  --m3e-drawer-container-width: 104px;
+  --m3e-drawer-divider-thickness: 0px;
+}
+
+.navigation-drawer {
+  width: 100%;
+  height: 100%;
+  background-color: var(--md-sys-color-surface-container-low);
+  --m3e-nav-rail-compact-width: 104px;
+}
+
+.layout-main {
   display: flex;
   flex-direction: column;
+  min-height: calc(100dvh - 64px);
 }
 
 .content-area {
   flex: 1;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px;
+  box-sizing: border-box;
 }
 
-/* Footer */
 .site-footer {
-  text-align: center;
-  padding: 20px;
-  margin-top: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  justify-content: center;
+  padding: 24px 16px 32px;
+  font-size: 0.8125rem;
   color: var(--md-sys-color-on-surface-variant);
-  font-size: 0.875rem;
 }
 
 .site-footer a {
@@ -355,58 +190,44 @@ function navigate(path: string) {
   text-decoration: underline;
 }
 
-/* Drawer backdrop for mobile overlay */
-.drawer-backdrop {
-  display: none;
-}
-
-@media (max-width: 840px) {
-  .app-bar-title {
-    font-size: 1.1rem;
-  }
-
-  .drawer-backdrop {
-    display: block;
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 49;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 300ms ease;
-  }
-
-  .drawer-backdrop.visible {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  /* Overlay drawer on mobile — floats above content instead of pushing it */
-  .drawer-wrapper {
-    position: fixed;
-    top: 64px;
-    left: 0;
-    height: calc(100vh - 64px);
-    z-index: 50;
-    overflow: hidden;
-  }
-
-  .drawer-wrapper.open {
-    box-shadow: 4px 0 16px rgba(0, 0, 0, 0.2);
-  }
-
-  .navigation-drawer {
-    border-radius: 0 16px 16px 0;
-  }
-}
-
 @media (max-width: 600px) {
-  .app-bar-title {
-    font-size: 1rem;
+  .content-area {
+    padding: 16px;
+  }
+}
+
+.route-enter-active {
+  animation: route-enter var(--md-sys-motion-spring-default-spatial, 500ms cubic-bezier(0.2, 0, 0, 1)) both;
+}
+
+.route-leave-active {
+  animation: route-leave var(--md-sys-motion-spring-fast-effects, 200ms cubic-bezier(0.31, 0.94, 0.34, 1)) both;
+}
+
+@keyframes route-enter {
+  from {
+    opacity: 0;
   }
 
-  .top-app-bar {
-    padding: 0 8px;
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes route-leave {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-enter-active,
+  .route-leave-active {
+    animation: none;
   }
 }
 </style>

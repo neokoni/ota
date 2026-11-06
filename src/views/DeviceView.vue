@@ -1,28 +1,36 @@
 <template>
   <div class="device-view">
-    <div class="md-card device-card">
-      <div class="card-content">
-        <h1>{{ deviceName }} ({{ codename }})</h1>
-        <p>选择一个系统以查看可用版本。</p>
-
-        <div class="system-list">
-          <div
-            v-for="system in systems"
-            :key="system.name"
-            class="md-card system-item"
-            role="button"
-            tabindex="0"
-            @click="selectSystem(system.name)"
-            @keydown.enter="selectSystem(system.name)"
-          >
-            <md-ripple></md-ripple>
-            <div class="system-info">
-              <h3>{{ system.name }}</h3>
-            </div>
-            <md-icon class="chevron-icon">chevron_right</md-icon>
+    <m3e-card variant="filled" class="hero-card">
+      <div slot="content">
+        <div class="hero-content">
+          <span class="device-icon">
+            <m3e-icon name="devices"></m3e-icon>
+          </span>
+          <div class="device-heading">
+            <m3e-heading variant="headline" size="small" level="1">{{ deviceName }}</m3e-heading>
+            <span class="device-codename">{{ codename }}</span>
           </div>
         </div>
+        <p class="hero-hint">选择一个系统以查看可用版本。</p>
       </div>
+    </m3e-card>
+
+    <m3e-action-list variant="segmented" class="system-list" aria-label="系统列表">
+      <m3e-list-action
+        v-for="system in systems"
+        :key="system.name"
+        @click="selectSystem(system.name)"
+      >
+        <m3e-icon slot="leading" name="deployed_code"></m3e-icon>
+        {{ system.name }}
+        <span slot="supporting-text">{{ system.versions.length }} 个版本</span>
+        <m3e-icon slot="trailing" name="chevron_right"></m3e-icon>
+      </m3e-list-action>
+    </m3e-action-list>
+
+    <div v-if="!systems.length" class="empty-state">
+      <m3e-icon name="deployed_code"></m3e-icon>
+      <p>该设备暂未配置任何系统。</p>
     </div>
   </div>
 </template>
@@ -41,87 +49,68 @@ const deviceName = computed(() => device.value?.name || '未知设备');
 const systems = computed(() => device.value?.systems || []);
 
 function selectSystem(system: string) {
-  router.push(`/device/${codename.value}/${system}`);
+  void router.push(`/device/${codename.value}/${system}`);
 }
 </script>
 
 <style scoped>
 .device-view {
-  padding: 20px;
-  max-width: 800px;
-  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-top: 8px;
 }
 
-.device-card {
-  padding: 24px;
-  width: 100%;
-  box-sizing: border-box;
-  background-color: var(--md-sys-color-surface-container-low);
-  border-radius: 16px;
-  border: 1px solid var(--md-sys-color-outline-variant);
+.hero-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
-.device-card h1 {
-  color: var(--md-sys-color-on-surface);
-  margin: 0 0 8px 0;
+.device-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: 18px;
+  background-color: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+  --m3e-icon-size: 30px;
 }
 
-.device-card > .card-content > p {
+.device-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.device-codename {
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
   color: var(--md-sys-color-on-surface-variant);
-  margin: 0 0 16px 0;
+}
+
+.hero-hint {
+  margin-top: 12px;
+  color: var(--md-sys-color-on-surface-variant);
 }
 
 .system-list {
-  margin-top: 20px;
+  --m3e-segmented-list-item-container-color: var(--md-sys-color-surface-container-high);
+}
+
+.empty-state {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-}
-
-.system-item {
-  position: relative;
-  overflow: hidden;
-  padding: 16px;
-  display: flex;
   align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
-  border-radius: 12px;
-  background-color: var(--md-sys-color-surface-container-highest);
-  border: 1px solid var(--md-sys-color-outline-variant);
-  transition: background-color 200ms ease;
-  outline: none;
-}
-
-.system-item:hover {
-  background-color: var(--md-sys-color-surface-variant);
-}
-
-.system-item:focus-visible {
-  outline: 3px solid var(--md-sys-color-primary);
-  outline-offset: 2px;
-}
-
-.system-info h3 {
-  margin: 0;
-  color: var(--md-sys-color-on-surface);
-}
-
-.chevron-icon {
+  gap: 12px;
+  padding: 48px 16px;
   color: var(--md-sys-color-on-surface-variant);
+  --m3e-icon-size: 40px;
 }
 
-@media (max-width: 600px) {
-  .device-view {
-    padding: 12px;
-  }
-
-  .device-card {
-    padding: 16px;
-  }
-
-  .device-card h1 {
-    font-size: 1.25rem;
-  }
+.empty-state p {
+  margin: 0;
 }
 </style>

@@ -1,6 +1,6 @@
-# Neokoni's OTA Center
+# NeoBuilds Changelog
 
-自托管的 OTA（空中升级）信息站点，展示 Neokoni ROM 构建的更新记录。
+查看Neokoni的ROM的更新记录。
 
 🔗 线上地址：**https://ota.neokoni.ink**
 
@@ -8,7 +8,7 @@
 
 - [Vue 3](https://vuejs.org/) + TypeScript（Composition API + `<script setup>`）
 - [Vite](https://vite.dev/) 构建工具
-- [@material/web 2](https://github.com/material-components/material-web)（Google 官方 Material Design 3 Web 组件）
+- [@m3e/web](https://github.com/matraic/m3e)（Material 3 Expressive Web Components）
 - [Vue Router 4](https://router.vuejs.org/)（HTML5 History 模式）
 
 ## 快速开始

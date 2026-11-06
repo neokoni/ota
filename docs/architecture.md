@@ -18,7 +18,8 @@ ota/
 │   │   └── main.css                # 全局样式
 │   ├── config/
 │   │   ├── devices.ts              # 设备数据类型定义与加载逻辑
-│   │   └── site.ts                 # 站点配置（ICP 备案、壁纸 API）
+│   │   ├── site.ts                 # 站点配置（ICP 备案、壁纸 API）
+│   │   └── theme.ts                # 动态取色与主题模式（auto/light/dark）
 │   ├── ota/
 │   │   ├── nabu.json               # 小米平板5 更新日志数据
 │   │   └── lemonades.json          # 一加9R 更新日志数据
@@ -53,7 +54,8 @@ ota/
 | TypeScript | ~5.9 | 类型系统 |
 | Vite | ^7.x | 构建工具与开发服务器 |
 | Vue Router 4 | ^4.6 | 客户端路由 |
-| @material/web | ^2.4.1 | Material Web Components（Google 官方 Material Design 3 Web 组件） |
+| @m3e/web | ^2.11 | Material 3 Expressive Web Components |
+| @m3e/icons | ^1.0 | Material Symbols（SVG，按需注册） |
 | Roboto / Noto Sans SC | — | 字体（中英文） |
 
 ## 路由结构
@@ -84,10 +86,11 @@ src/config/devices.ts   ← import.meta.glob 动态加载所有 JSON
 
 ## App.vue 根组件功能
 
-- **顶部应用栏**：品牌 logo + 名称（点击返回首页）、菜单按钮、主题切换按钮
-- **侧边抽屉导航**：首页入口 + 所有设备快捷链接（自动从 `devices` 配置生成）
-- **主题模式**：支持 `auto` / `light` / `dark` 三档，偏好保存到 `localStorage`
-- **动态配色**：通过必应壁纸 API 提取主色调，调用 `@material/material-color-utilities` 的 `applyTheme()` 动态换肤
+- **顶部应用栏**：`m3e-app-bar`，品牌 logo + 名称（点击返回首页）、抽屉开关、主题切换按钮
+- **侧边导航栏**：`m3e-drawer-container` + `m3e-nav-rail`，仅包含「主页」与「设备列表」两个入口；桌面端默认展开，导航后保持展开
+- **主题模式**：`m3e-theme` 的 `scheme` 支持 `auto` / `light` / `dark` 三档，偏好保存到 `localStorage`
+- **动态配色**：通过必应壁纸 API 提取主色调，每日缓存一次（`localStorage`，按本地日期）；`m3e-theme` 使用该源色生成 Tonal Spot 动态方案，选中态等组件颜色均由主题 token 派生，不单独硬编码
+- **页面过渡**：`router-view` 使用 Vue `<transition mode="out-in">`，进入/离开动画复用 `--md-sys-motion-spring-*` token，并遵循 `prefers-reduced-motion`
 
 ## Vite 自定义插件
 
@@ -131,14 +134,15 @@ src/config/devices.ts   ← import.meta.glob 动态加载所有 JSON
 
 ### 悬停效果
 
-所有可交互元素（导航项、设备卡片、系统项、版本项）的悬停效果**仅使用 `background-color` 过渡**，禁止使用 `box-shadow` 或 `transform: translateY`：
+悬停/按下反馈仅使用组件自身的 state layer（背景色），禁止阴影或位移。`main.css` 中已将 `m3e-button` / `m3e-card` 的 hover/focus/pressed elevation token 统一置为 `0`：
 
 ```css
-/* 正确 */
-transition: background-color 200ms ease;
-.item:hover { background-color: var(--md-sys-color-surface-variant); }
-
-/* 禁止——不使用 box-shadow 或 transform 作为 hover 效果 */
+m3e-button {
+  --m3e-filled-button-hover-container-elevation: 0;
+}
+m3e-card {
+  --m3e-filled-card-hover-container-elevation: 0;
+}
 ```
 
 ### 卡片盒模型
@@ -166,11 +170,4 @@ transition: background-color 200ms ease;
 
 ### 焦点样式
 
-键盘导航可访问性使用 `:focus-visible`：
-
-```css
-.item:focus-visible {
-  outline: 3px solid var(--md-sys-color-primary);
-  outline-offset: 2px;
-}
-```
+`m3e-theme` 启用了 `strong-focus`，所有 M3E 组件自带统一焦点环；自定义元素使用 `:focus-visible` 时沿用 `outline: 3px solid var(--md-sys-color-primary)`。

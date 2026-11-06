@@ -2,7 +2,7 @@
 
 ## 项目概述
 
-**ota_site** 是一个自托管的 OTA（空中升级）信息站点，展示 Neokoni ROM 构建的更新记录。
+**ota_site** 是 NeoBuilds Changelog，展示 Neokoni ROM 的更新记录。
 - 线上地址：`https://ota.neokoni.ink`
 - 面向用户：ROM 用户查看更新日志；刷机工具（如 Avium）读取 OTA JSON
 
@@ -14,7 +14,8 @@
 | TypeScript | ~5.9 | 类型系统 |
 | Vite | ^7.x | 构建工具与开发服务器 |
 | Vue Router 4 | ^4.6 | 客户端路由（HTML5 History 模式） |
-| @material/web | ^2.4.1 | Material Web Components（Google 官方 Material Design 3 Web 组件） |
+| @m3e/web | ^2.11 | Material 3 Expressive Web Components |
+| @m3e/icons | ^1.0 | Material Symbols（SVG，按需注册） |
 
 ## 目录结构
 
@@ -26,7 +27,8 @@ ota/
 │   ├── assets/main.css         # 全局样式（CSS 变量、字体、基础覆盖）
 │   ├── config/
 │   │   ├── devices.ts          # 类型定义 + import.meta.glob 加载所有 ota/*.json
-│   │   └── site.ts             # ICP 备案信息 (siteConfig) + 壁纸 API (wallpaperConfig)
+│   │   ├── site.ts             # ICP 备案信息 (siteConfig) + 壁纸 API (wallpaperConfig)
+│   │   └── theme.ts            # 动态取色（每日缓存）+ auto/light/dark 主题模式
 │   ├── ota/
 │   │   ├── nabu.json           # 小米平板5 (Xiaomi Pad 5) 更新日志
 │   │   └── lemonades.json      # 一加9R (OnePlus 9R) 更新日志
@@ -61,7 +63,7 @@ ota/
 ```
 src/ota/*.json
   └─ import.meta.glob (devices.ts)
-       ├─ devices[]          → DeviceSelectionView, App.vue 侧边导航
+       ├─ devices[]          → DeviceSelectionView / DeviceView
        ├─ getDevice()        → DeviceView, ChangelogView
        └─ getSystem()        → SystemView, ChangelogView
 ```
@@ -91,25 +93,20 @@ src/ota/*.json
 
 ## UI 设计惯例（CSS 规范）
 
-- **悬停效果**：仅使用 `background-color` 过渡，禁止使用 `box-shadow` 或 `transform: translateY`
-  ```css
-  /* 正确 */
-  transition: background-color 200ms ease;
-  .item:hover { background-color: var(--md-sys-color-surface-variant); }
-  /* 禁止 */
-  /* box-shadow、transform: translateY 不用于 hover 状态 */
-  ```
-- **卡片盒模型**：包含 `padding` 的卡片/容器必须设置 `box-sizing: border-box`，防止移动端溢出
+- **组件库**：统一使用 `m3e-*` 自定义元素（`@m3e/web`），图标使用 `m3e-icon` + `@m3e/icons` 的 SVG 模块（`import "@m3e/icons/outlined/<name>"`）
+- **悬停效果**：仅使用 state layer/背景色，禁止使用 `box-shadow` 或 `transform: translateY`；`main.css` 已将 `m3e-button` / `m3e-card` 的 hover/focus/pressed elevation token 置为 `0`
+- **卡片盒模型**：包含 `padding` 的自定义容器必须设置 `box-sizing: border-box`，防止移动端溢出
 - **移动端适配**：`@media (max-width: 600px)` 减少容器和卡片的 `padding`
-- **颜色系统**：使用 `var(--md-sys-color-*)` CSS 变量（@material/web / Material Design 3 token），在 `main.css` 中有静态回退值，运行时由 `applyTheme()` 动态覆盖
-- **焦点样式**：使用 `:focus-visible { outline: 3px solid var(--md-sys-color-primary); }` 键盘导航可访问性
+- **颜色系统**：使用 `var(--md-sys-color-*)` token；`m3e-theme` 在运行时根据壁纸源色生成 Tonal Spot 动态方案，不要单独硬编码组件颜色（选中态等由主题 token 自动派生）
+- **焦点样式**：`m3e-theme` 已启用 `strong-focus`；自定义元素沿用 `:focus-visible { outline: 3px solid var(--md-sys-color-primary); }`
 
 ## App.vue 核心功能
 
-- **顶部栏**：品牌 logo + 名称（点击返回首页）、菜单按钮、主题切换按钮
-- **侧边抽屉**：首页入口 + 所有设备快捷链接（从 `devices` 配置自动生成）；移动端使用半透明遮罩 + push 布局
-- **主题模式**：`auto` / `light` / `dark`，偏好存入 `localStorage`
-- **动态配色**：从必应壁纸 API（`wallpaperConfig.api`）提取主色调，调用 `applyTheme()` 换肤
+- **顶部栏**：`m3e-app-bar`，品牌 logo + 名称（点击返回首页）、抽屉开关、主题切换按钮
+- **侧边导航**：`m3e-drawer-container` + `m3e-nav-rail`，仅「主页」与「设备列表」两个入口（设备列表 → `/devices`）；桌面端默认展开、导航后不收起，移动端为覆盖式抽屉
+- **主题模式**：`auto` / `light` / `dark`，绑定 `m3e-theme` 的 `scheme`，偏好存入 `localStorage`
+- **动态配色**：从必应壁纸 API（`wallpaperConfig.api`）提取源色，按本地日期每日缓存一次；`src/config/theme.ts` 负责取色与主题模式
+- **页面过渡**：`router-view` 使用 `<transition mode="out-in">`，动画时长/缓动复用 `--md-sys-motion-spring-*` token，并尊重 `prefers-reduced-motion`
 
 ## Vite 自定义插件（vite.config.ts）
 
